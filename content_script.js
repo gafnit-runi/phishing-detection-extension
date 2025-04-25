@@ -1,3 +1,6 @@
+// Testing entropy branch
+
+
 // Content script that runs on every page
 console.log('Phishing Detection Extension: Content script loaded');
 
