@@ -1,0 +1,11 @@
+url,expected_label,risk_score,reasons
+https://fellow.app/,benign,,[]
+https://hardverapro.hu/index.html,benign,,[]
+https://dailynayadiganta.com/,benign,,[]
+https://postie.com/,benign,,[]
+https://www.amazon.es/,benign,,[]
+https://au.kirmalk.com/kr1,benign,,[]
+https://blis.com/,benign,,[]
+https://www.sciencefriday.com/,benign,,[]
+https://www.ctt.pt/particulares/index,benign,,[]
+https://www.bitchute.com/,benign,,[]
