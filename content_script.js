@@ -272,6 +272,7 @@ function checkForPhishing() {
   // Expose to window (for Selenium or testing)
   window.riskScore = riskScore;
   window.riskReasons = allReasons;
+  console.log("✅ riskScore exposed to window:", window.riskScore);
   console.log('riskScore:',riskScore)
   // Send results to background script
   chrome.runtime.sendMessage({
