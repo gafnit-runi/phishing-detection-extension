@@ -2,6 +2,13 @@
 console.log('Phishing Detection Extension: Content script loaded');
 
 // === Entropy Calculator ===
+/**
+ * Calculates Shannon entropy - measures the randomness or complexity of a string.
+ * - \sum p_i \cdot \log_2(p_i)
+
+ * @param {string} str - The input string (e.g., a URL)
+ * @returns {number} entropy - The entropy score (higher means more random)
+ */
 function calculateEntropy(str) {
   console.log('calculateEntropy');
   const frequency = {};
@@ -17,98 +24,85 @@ function calculateEntropy(str) {
   return entropy;
 }
 
-// // === LinkGuard Heuristic Function ===
-// function runLinkGuardHeuristics() {
-//   const links = document.querySelectorAll('a');
-//   let score = 0;
-//   const reasons = [];
-
-//   links.forEach(link => {
-//     const text = (link.textContent || "").trim();
-//     const href = (link.href || "").trim();
-
-//     if (!href || href.startsWith('javascript')) return;
-
-//     try {
-//       const linkDomain = new URL(href).hostname.toLowerCase();
-
-//       // IP Address Detection
-//       if (/^\d{1,3}(\.\d{1,3}){3}/.test(linkDomain)) {
-//         score += 1;
-//         reasons.push(`Link to IP address: ${href}`);
-//       }
-
-//       // Mismatch between anchor text and link target
-//       if (text && text.includes('.') && !href.includes(text)) {
-//         score += 1;
-//         reasons.push(`Mismatched text vs href: text="${text}" → href="${href}"`);
-//       }
-
-//       if (href.length > 100 || /%[0-9a-f]{2}/i.test(href)) {
-//         score += 0.5;
-//         reasons.push(`Suspicious long or encoded link: ${href}`);
-//       }
-//     } catch (e) {
-//       // Invalid URL — skip
-//     }
-//   });
-
-//   const finalScore = Math.min(score, 3);
-//   return { score: finalScore, reasons };
-// }
+/**
+ * Detects suspicious dynamic behavior on the page,
+ * 1. redirects after the initial load.
+ * 2.Dynamically added <script> or <iframe> elements (common in phishing attacks)
+ */
 
 function detectByDynamicBehavior() {
-  let score = 0;
-  const reasons = [];
+  return new Promise((resolve) => {
+    let score = 0;
+    const reasons = [];
 
-  // Detect redirect (example — adjust as needed)
-  const navEntry = performance.getEntriesByType("navigation")[0];
-  if (navEntry && navEntry.type === "reload" && navEntry.redirectCount > 0) {
-    score += 1;
-    reasons.push("Suspicious redirect detected after page load.");
-  }
-
-  // Monitor for dynamic script or iframe injections
-  const observer = new MutationObserver(mutations => {
-    mutations.forEach(mutation => {
-      mutation.addedNodes.forEach(node => {
-        if (
-          node.tagName === "SCRIPT" ||
-          node.tagName === "IFRAME"
-        ) {
+    // Detect redirect using Navigation Timing API
+    const navEntry = performance.getEntriesByType("navigation")[0];
+    const currentUrl = window.location.href;
+    if (navEntry && navEntry.type === "reload" && navEntry.redirectCount > 0) {
+    if (navEntry?.name) {
+      try {
+        const originalUrl = new URL(navEntry.name);
+        const currentParsed = new URL(currentUrl);
+        const samePath = originalUrl.origin + originalUrl.pathname === currentParsed.origin + currentParsed.pathname;
+        const sameQuery = originalUrl.search === currentParsed.search;
+        if (!samePath || !sameQuery) {
           score += 1;
-          reasons.push(`Dynamically injected <${node.tagName.toLowerCase()}> detected.`);
+      score += 1;
+          reasons.push(`Redirect detected: ${originalUrl.href} → ${currentParsed.href}`);
         }
+      } catch (err) {
+        reasons.push("Redirect detection failed (malformed URL).");
+      reasons.push("Suspicious redirect detected after page load.");
+      }
+    }
+
+    // Monitor for dynamic script or iframe injections
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+          if (node.tagName === "SCRIPT" || node.tagName === "IFRAME") {
+            score += 1;
+            reasons.push(`Dynamically injected <${node.tagName.toLowerCase()}> detected.`);
+          }
+        });
       });
     });
+
+    // Delay observation start to avoid false positives
+    setTimeout(() => {
+      const body = document.body;
+      if (body) {
+        observer.observe(body, {
+          childList: true,
+          subtree: true
+        });
+
+        // Stop observing after 5s and resolve the result
+        setTimeout(() => {
+          observer.disconnect();
+          console.log("Dynamic Behavior Check Done", { score, reasons });
+          resolve({
+            score: score >= 1 ? 1 : 0,
+            reasons
+          });
+        }, 5000);
+      } else {
+        resolve({ score: 0, reasons: ["Document body not available"] });
+      }
+    }, 2000); 
   });
-
-  // Observe body for changes
-  setTimeout(() => {
-    const body = document.body;
-    if (body) {
-      observer.observe(body, {
-        childList: true,
-        subtree: true
-      });
-
-      // Stop observing after 5 seconds (clean up)
-      setTimeout(() => observer.disconnect(), 5000);
-    }
-  }, 2000); // wait 2s before starting observation
-
-  // Return immediately with initial values;
-  // you’ll update risk after observer catches changes
-
-  console.log("Detec By Dynamic Behavior", { score, reasons });
-  return {
-    score: score >= 1 ? 1 : 0,
-    reasons
-  };
 }
 
 
 // Static URL Analysis
+/*
+checks the website’s URL and domain
+  1.  Fake or spoofed brand names in the domain (e.g., paypa1.com)
+	2.	High entropy 
+	3.	Suspicious keywords
+	4.	Unusual characteristics (long URLs) or numeric IP addresses
+	5.	Obfuscated brand names (g00gle)
+*/
 function detectByStaticURL(url, domain) {
   const urlLower = url.toLowerCase();
 
@@ -172,6 +166,14 @@ function detectByStaticURL(url, domain) {
   }
 }
 
+/*
+structure and elements of the webpage’s HTML
+	1.	Link mismatches (link says “paypal.com” but leads elsewhere)
+	2.	Suspicious links (links to IP addresses or with encoded characters)
+	3.	Insecure forms 
+	4.	Sensitive input fields
+	5.	The page isn’t using a secure protocol- Missing HTTPS
+*/
 function detectByStaticContent() {
   let score = 0;
   const reasons = [];
@@ -225,31 +227,6 @@ function detectByStaticContent() {
   };
 }
 
-// Detects redirect after load
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    const navEntry = performance.getEntriesByType("navigation")[0];
-    const original = navEntry?.name;
-    const current = window.location.href;
-
-    if (!original) return; // no redirect info available
-
-    try {
-      const originalUrl = new URL(original);
-      const currentUrl = new URL(current);
-
-      const samePath = originalUrl.origin + originalUrl.pathname === currentUrl.origin + currentUrl.pathname;
-      const sameQuery = originalUrl.search === currentUrl.search;
-
-      if (!samePath || !sameQuery) {
-        dynamicFlag = 1;
-        console.warn("Redirect detected:", original, "→", current);
-      }
-    } catch (err) {
-      console.warn(" Redirect detection failed due to malformed URL:", err);
-    }
-  }, 2000);
-});
 
 
 ////////// Main function to calcualte final score for potential phishing //////////
