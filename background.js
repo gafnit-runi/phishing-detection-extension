@@ -13,30 +13,6 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
   analysisResults.delete(details.tabId);
 });
 
-function isInjectablePage(url) {
-  return url.startsWith("http") &&
-         !url.includes("chrome.google.com") &&
-         !url.includes("drive.google.com") &&
-         !url.includes("mail.google.com");
-}
-
-chrome.webNavigation.onCompleted.addListener((details) => {
-  if (!isInjectablePage(details.url)) {
-    console.warn("⚠️ Skipping restricted page:", details.url);
-    return;
-  }
-
-  chrome.tabs.sendMessage(details.tabId, { type: "REQUEST_ANALYSIS" }, (response) => {
-    if (chrome.runtime.lastError) {
-      console.warn("❌ Could not reach content script:", chrome.runtime.lastError.message);
-    } else {
-      console.log("✅ Got response from content script:", response);
-    }
-  });
-}, {
-  url: [{ schemes: ["http", "https"] }]
-});
-
 // Function to safely send message to a tab
 async function sendMessageToTab(tabId, message) {
   try {
@@ -55,6 +31,22 @@ async function sendMessageToTab(tabId, message) {
     console.error('Error sending message to tab:', error);
   }
 }
+
+// listener for model purpose
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "check_url") {
+    console.log("check_url");
+    fetch("http://localhost:5000/check_url", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ domain: request.domain })
+    })
+      .then(res => res.json())
+      .then(data => sendResponse({ prediction: data.prediction }))
+      .catch(err => sendResponse({ prediction: "error", error: err.message }));
+    return true; // keep the message channel open for sendResponse
+  }
+});
 
 // Listen for messages from content script and popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

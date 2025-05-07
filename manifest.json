@@ -1,3 +1,4 @@
+
 {
   "manifest_version": 3,
   "name": "Phishing Detection Extension",
@@ -9,7 +10,8 @@
     "webNavigation"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "<all_urls>",
+    "http://localhost:5000/"
   ],
   "action": {
     "default_popup": "popup.html",
