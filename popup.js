@@ -1,3 +1,4 @@
+
 // Get the current active tab
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const currentTab = tabs[0];
@@ -32,13 +33,14 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         tabId: currentTab.id,
         url: currentTab.url,
         forceNewScan: true  // Add flag to force new scan
-      }
+      },
     });
   });
 });
 
 // Function to determine phishing decision based on risk score
 function getPhishingDecision(riskScore) {
+  console.log('getPhishingDecision:', riskScore);
   if (riskScore >= 7) {
     return {
       status: 'dangerous',
@@ -82,7 +84,6 @@ function formatTimestamp(timestamp) {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const statusElement = document.getElementById('status');
   const scanButton = document.getElementById('scanButton');
-  
   if (request.type === 'ANALYSIS_RESULT') {
     // Re-enable scan button
     scanButton.disabled = false;
