@@ -4,97 +4,45 @@
   <title>Phishing Detection</title>
   <style>
     body {
-      width: 400px;
-      padding: 15px;
+      width: 300px;
+      padding: 10px;
       font-family: Arial, sans-serif;
     }
     .status {
       margin: 10px 0;
       padding: 10px;
       border-radius: 4px;
-      background-color: #f0f0f0;
     }
-    .url-container {
-      word-break: break-all;
-      margin: 5px 0;
-      padding: 5px;
-      background-color: #fff;
-      border: 1px solid #ddd;
-      border-radius: 3px;
+    .analyzing {
+      background-color: #fff3cd;
+      color: #856404;
     }
-    .domain {
-      font-weight: bold;
-      color: #2196F3;
-    }
-    .risk-score {
-      font-weight: bold;
-      color: black;
-    }
-    .timestamp {
-      color: #666;
-      font-size: 0.9em;
-    }
-    .warning {
-      color: red;
-      font-weight: bold;
-    }
-    .decision {
-      margin: 15px 0;
+    .result {
+      margin: 10px 0;
       padding: 10px;
       border-radius: 4px;
-      text-align: center;
-      font-weight: bold;
     }
-    .safe {
-      background-color: #4CAF50;
-      color: white;
+    .phishing {
+      background-color: #f8d7da;
+      color: #721c24;
     }
-    .suspicious {
-      background-color: #FFC107;
-      color: black;
+    .benign {
+      background-color: #d4edda;
+      color: #155724;
     }
-    .dangerous {
-      background-color: #F44336;
-      color: white;
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
     }
-    .decision-icon {
-      font-size: 24px;
-      margin-right: 10px;
-    }
-    .scan-button {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      margin: 20px 0 0 0;
-      background-color: #2196F3;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .scan-button:hover {
-      background-color: #1976D2;
-    }
-    .scan-button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-    .footer {
-      margin-top: 20px;
-      padding-top: 10px;
-      border-top: 1px solid #eee;
+    .no-results {
+      color: #6c757d;
     }
   </style>
 </head>
 <body>
   <h2>Phishing Detection</h2>
-  <div class="status" id="status">
-    Scanning current page...
-  </div>
-  <div class="footer">
-    <button id="scanButton" class="scan-button">Scan Now</button>
-  </div>
+  <div id="status" class="status"></div>
+  <div id="result" class="result"></div>
   <script src="popup.js"></script>
 </body>
 </html> 
