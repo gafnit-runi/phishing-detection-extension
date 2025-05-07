@@ -96,7 +96,7 @@ function detectByDynamicBehavior() {
 
 // Static URL Analysis
 /*
-checks the website’s URL and domain
+checks the website's URL and domain
   1.  Fake or spoofed brand names in the domain (e.g., paypa1.com)
 	2.	High entropy 
 	3.	Suspicious keywords
@@ -166,13 +166,40 @@ function detectByStaticURL(url, domain) {
   }
 }
 
+// Add this function before detectByStaticContent
+function isValidDomain(domain) {
+  // Domain pattern: alphanumeric, hyphens, and dots
+  // Must start and end with alphanumeric
+  // Each part between dots must be 1-63 chars
+  const domainPattern = /^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63})*\.[A-Za-z]{2,}$/;
+  return domainPattern.test(domain);
+}
+
+function extractDomainFromText(text) {
+  // Remove common prefixes and protocols
+  text = text.replace(/^(https?:\/\/)?(www\.)?/i, '');
+  
+  // Split by common separators and take the first part
+  const parts = text.split(/[\s\/\?&#]/);
+  const potentialDomain = parts[0];
+  
+  // Check if it's a valid domain format
+  if (isValidDomain(potentialDomain)) {
+    return potentialDomain;
+  }
+  
+  return null;
+}
+
+
+
 /*
-structure and elements of the webpage’s HTML
-	1.	Link mismatches (link says “paypal.com” but leads elsewhere)
+structure and elements of the webpage's HTML
+	1.	Link mismatches (link says "paypal.com" but leads elsewhere)
 	2.	Suspicious links (links to IP addresses or with encoded characters)
 	3.	Insecure forms 
 	4.	Sensitive input fields
-	5.	The page isn’t using a secure protocol- Missing HTTPS
+	5.	The page isn't using a secure protocol- Missing HTTPS
 */
 function detectByStaticContent() {
   let score = 0;
@@ -182,10 +209,27 @@ function detectByStaticContent() {
   document.querySelectorAll('a').forEach(link => {
     const text = link.textContent || "";
     const href = link.href || "";
-
-    if (text.includes('.') && !href.includes(text)) {
-      LinkGuard_score += 1;
-      reasons.push(`Mismatched anchor text vs href: "${text}" → "${href}"`);
+    
+    // Skip if link contains elements with src attribute (like images)
+    if (link.querySelector('[src]')) {
+      console.log("link contains src attribute")
+      return;
+    }
+    
+    if (text.includes('.')) {
+      const domainFromText = extractDomainFromText(text.trim());
+      if (domainFromText) {
+        try {
+          const linkUrl = new URL(href);
+          if (!linkUrl.hostname.includes(domainFromText)) {
+            // Potential phishing link detected
+            LinkGuard_score += 1;
+            reasons.push(`Mismatched anchor text vs href: "${domainFromText}" → "${href}"`);
+          }
+        } catch (e) {
+          console.error('Error parsing URL:', e);
+        }
+      }
     }
 
     if (/^\d{1,3}(\.\d{1,3}){3}/.test(href)) {
@@ -193,10 +237,10 @@ function detectByStaticContent() {
       reasons.push(`Link to raw IP address: ${href}`);
     }
 
-    if (/%[0-9a-f]{2}/i.test(href) || href.length > 100) {
-      LinkGuard_score += 1;
-      reasons.push(`Encoded or overly long link: ${href}`);
-    }
+    // if (/%[0-9a-f]{2}/i.test(href) || href.length > 100) {
+    //   LinkGuard_score += 1;
+    //   reasons.push(`Encoded or overly long link: ${href}`);
+    // }
     
   });
   score += LinkGuard_score !== 0 ? 1 : 0;
@@ -305,4 +349,14 @@ window.addEventListener('load', () => {
     console.log('Page fully loaded, starting phishing check');
     checkForPhishing();
   }, 3000);
+});
+
+// Wait for the page to load
+setTimeout(() => {
+  // Notify that scanning has started
+  chrome.runtime.sendMessage({ type: 'START_SCAN' });
+  
+  // Get all links on the page
+  const links = document.getElementsByTagName('a');
+  // ... rest of the scanning code ...
 }); 

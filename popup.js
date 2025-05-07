@@ -110,6 +110,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       <p class="timestamp">Last Checked: ${timestamp}</p>
     `;
   } else if (request.type === 'SUSPICIOUS_REDIRECT') {
+    console.log('SUSPICIOUS_REDIRECT');
     // Re-enable scan button
     scanButton.disabled = false;
     scanButton.textContent = 'Scan Now';
