@@ -1,7 +1,7 @@
 import joblib
 import json
 
-clf = joblib.load("phishing_detector.pkl")
+clf = joblib.load("random_forest_model_reduced.pkl")
 
 def tree_to_dict(tree):
     tree_ = tree.tree_
@@ -29,8 +29,23 @@ forest_json = {
     "trees": [tree_to_dict(tree) for tree in clf.estimators_]
 }
 
+#For debugging adding feature names
+# forest_json["feature_names"] = clf.feature_names_in_.tolist()
+
 # Save as JSON
-with open("phishing_detector.json", "w") as f:
+with open("random_forest_model_reduced.json", "w") as f:
     json.dump(forest_json, f)
 
-print("✅ Model exported as phishing_detector.json")
+print("Model exported as random_forest_model_reduced.json")
+
+scaler = joblib.load("scaler.pkl")
+
+scaler_params = {
+    "mean": scaler.mean_.tolist(),
+    "scale": scaler.scale_.tolist()
+}
+
+with open("scaler_params.json", "w") as f:
+    json.dump(scaler_params, f)
+
+print("Scaler parameters exported to scaler_params.json")

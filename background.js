@@ -1,5 +1,6 @@
 // Background script for the extension
 import { extractFullFeatures } from './feature_extraction.js';
+let scaler = null;
 
 chrome.runtime.onInstalled.addListener(() => {
   console.log('Phishing Detection Extension installed');
@@ -38,7 +39,7 @@ async function sendMessageToTab(tabId, message) {
 let model = null;
 async function loadModel() {
   try {
-    const response = await fetch(chrome.runtime.getURL('phishing_detector.json'));
+    const response = await fetch(chrome.runtime.getURL('random_forest_model_reduced.json'));
     model = await response.json();  
     console.log('Model loaded successfully');
     console.log(model);
@@ -46,6 +47,25 @@ async function loadModel() {
   } catch (error) {
     console.error('Error loading model:', error);
   }
+}
+
+async function loadScaler() {
+  try {
+    const response = await fetch(chrome.runtime.getURL('scaler_params.json'));
+    scaler = await response.json();
+    console.log('Scaler loaded successfully');
+  } catch (error) {
+    console.error('Error loading scaler:', error);
+  }
+}
+
+function standardizeFeatures(features, means, scales) {
+  const standardized = {};
+  Object.keys(features).forEach((key, i) => {
+    const val = features[key];
+    standardized[key] = (val - means[i]) / scales[i];
+  });
+  return standardized;
 }
 
 function runTree(tree, features) {
@@ -69,17 +89,19 @@ function runModel(model, features) {
 
 // Call loadModel when the extension starts
 loadModel();
+loadScaler();
 
 // Model-based detection
 function detectPhishing(domain) {
   console.log(model);
-  if (!model) {
-    console.error('Model not loaded');
+  if (!model || !scaler) {
+    console.error('Model or scaler not loaded');
     return "error";
   }
 
-  const features = extractFullFeatures(domain);
-  const prediction = runModel(model, features); // Returns 0 or 1
+  const rawFeatures = extractFullFeatures(url);
+  const standardized = standardizeFeatures(rawFeatures, scaler.mean, scaler.scale);
+  const prediction = runModel(model, standardized);// Returns 0 or 1
   return prediction === 1 ? "phishing" : "benign";
 }
 
