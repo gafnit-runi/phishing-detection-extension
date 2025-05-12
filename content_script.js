@@ -272,19 +272,6 @@ function detectByStaticContent() {
   };
 }
 
-
-// async function checkUrlWithModel(domain) {
-//   const response = await fetch("http://localhost:5000/check_url", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({ domain })
-//   });
-
-//   const result = await response.json();
-//   console.log("Test by model", {result });
-//   return result.prediction;  // 'phishing' or 'benign'
-// }
-
 ////////// Main function to calcualte final score for potential phishing //////////
 
 async function checkForPhishing() {
@@ -298,9 +285,10 @@ async function checkForPhishing() {
 
   // Ask background to run the model
   const result = await new Promise((resolve) => {
-    chrome.runtime.sendMessage({ action: "check_url", domain }, (response) => {
-      console.log("Model prediction:", response);
-      resolve(response.prediction);
+    chrome.runtime.sendMessage({ action: "check_url", url }, (response) => {
+      console.log("Prediction:", response.prediction);
+      console.log("Confidence:", response.confidence);
+      resolve(response);
     });
   });
 

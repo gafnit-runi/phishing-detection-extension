@@ -77,22 +77,34 @@ function runTree(tree, features) {
 }
 
 function runModel(model, features) {
-  const votes = new Array(model.n_classes).fill(0);
+  const classTotals = new Array(model.n_classes).fill(0);
+  const ordered = model.feature_names.map(f => features[f]);
+  console.log("Ordered features:", ordered);
   for (const tree of model.trees) {
-    const output = runTree(tree, features);
-    const predicted_class = output.indexOf(Math.max(...output));
-    votes[predicted_class]++;
+    const output = runTree(tree, ordered); 
+    console.log("Tree output:", output);
+    for (let i = 0; i < model.n_classes; i++) {
+      classTotals[i] += output[i]; 
+    }
   }
-  return votes.indexOf(Math.max(...votes));
+
+  const totalVotes = classTotals.reduce((a, b) => a + b, 0);
+  const probabilities = classTotals.map(v => v / totalVotes);
+
+  const predicted_class = classTotals.indexOf(Math.max(...classTotals));
+  const confidence = probabilities[predicted_class];
+
+  return { predicted_class, confidence };
+  // return votes.indexOf(Math.max(...votes));
 }
 
 
 // Call loadModel when the extension starts
 loadModel();
-loadScaler();
+loadScaler();extractFullFeatures
 
 // Model-based detection
-function detectPhishing(domain) {
+function detectPhishing(url) {
   console.log(model);
   if (!model || !scaler) {
     console.error('Model or scaler not loaded');
@@ -100,16 +112,23 @@ function detectPhishing(domain) {
   }
 
   const rawFeatures = extractFullFeatures(url);
+  if (!rawFeatures) {
+    return { prediction: "error", confidence: 0 };
+  }
+  console.log("Extracted features:", rawFeatures);
   const standardized = standardizeFeatures(rawFeatures, scaler.mean, scaler.scale);
-  const prediction = runModel(model, standardized);// Returns 0 or 1
-  return prediction === 1 ? "phishing" : "benign";
+  console.log("Standardized features:", standardized);
+  const { predicted_class, confidence } = runModel(model, standardized);// Returns 0 or 1
+  console.log("Predicted class:", predicted_class," Confidence:", confidence);
+  return { prediction: predicted_class === 1 ? "phishing" : "benign", confidence };
 }
 
 // Handle messages from content script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "check_url") {
-    const prediction = detectPhishing(request.domain);
-    sendResponse({ prediction });
+    console.log("check_url", request.url);
+    const { prediction, confidence } = detectPhishing(request.url);
+    sendResponse({ prediction: prediction, confidence: confidence });
   }
   return true;
 });

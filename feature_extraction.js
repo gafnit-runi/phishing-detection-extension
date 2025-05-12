@@ -1,5 +1,5 @@
 // External sets to be imported or defined globally
-const TOP_DOMAINS = new Set();
+// const TOP_DOMAINS = new Set();
 const SUSPICIOUS_TLDS = new Set([
   "tk", "ml", "ga", "cf", "gq", "xyz", "top", "pw", "cc", "country", "download",
   "racing", "icu", "work", "casa", "link", "click", "space", "fun", "science",
@@ -8,35 +8,40 @@ const SUSPICIOUS_TLDS = new Set([
   "monster", "ren", "wang", "world", "tech", "rest", "bar", "best", "cam",
   "cyou", "surf", "mom", "dad", "kids", "hair", "pics", "photo", "cloud"
 ]);
-KNOWN_BRANDS = new Set([
-
+const KNOWN_BRANDS = new Set([
+  // Financial Services & Payment
   "paypal", "stripe", "square", "visa", "mastercard", "amex", "chase", "wellsfargo",
   "bankofamerica", "citibank", "hsbc", "barclays", "capitalone", "discover", "venmo",
   "cashapp", "westernunion", "transferwise", "revolut", "klarna", "affirm",
   
- 
+  // Tech Giants & Social Media
   "google", "facebook", "apple", "amazon", "microsoft", "meta", "twitter", "linkedin",
   "instagram", "tiktok", "snapchat", "pinterest", "reddit", "youtube", "whatsapp",
   "telegram", "wechat", "line", "kakao", "viber",
   
-
+  // Email & Cloud Services
   "outlook", "yahoo", "gmail", "protonmail", "icloud", "zoho", "dropbox", "box",
   "onedrive", "googledrive", "evernote", "notion", "airtable", "office365",
   
+  // E-commerce & Retail
   "ebay", "walmart", "target", "bestbuy", "costco", "aliexpress", "shopify", "etsy",
   "wayfair", "homedepot", "lowes", "ikea", "nike", "adidas", "macys", "nordstrom",
   
+  // Entertainment & Streaming
   "netflix", "spotify", "disney", "hulu", "amazonprime", "hbomax", "peacock",
   "paramount", "twitch", "steam", "epicgames", "nintendo", "playstation", "xbox",
- 
+  
+  // Business & Productivity
   "zoom", "teams", "slack", "asana", "trello", "github", "gitlab", "bitbucket",
   "atlassian", "salesforce", "hubspot", "zendesk", "freshworks", "quickbooks", "xero",
   
+  // Travel & Transportation
   "uber", "lyft", "airbnb", "booking", "expedia", "tripadvisor", "marriott",
   "hilton", "delta", "united", "southwest", "americanairlines", "britishairways",
- 
+  
+  // Food Delivery
   "doordash", "ubereats", "grubhub", "postmates", "instacart", "gopuff"
-])
+]);
 
 const URL_SHORTENERS = new Set([
   "bit.ly", "goo.gl", "tinyurl.com", "t.co", "ow.ly", "buff.ly", "cutt.ly",
@@ -125,13 +130,13 @@ function levenshtein(a, b) {
   return matrix[a.length][b.length];
 }
 
-function extractFullFeatures(domain) {
+function extractFullFeatures(url) {
+  console.log("extractFullFeatures", url);
   try {
-    const a = document.createElement("a");
-    a.href = url.startsWith("http") ? url : `http://${url}`;
-    const domain = a.hostname.toLowerCase();
-    const path = a.pathname.toLowerCase();
-    const query = a.search.toLowerCase();
+    const parsedUrl = new URL(url.startsWith("http") ? url : `http://${url}`);
+    const domain = parsedUrl.hostname.toLowerCase();
+    const path = parsedUrl.pathname.toLowerCase();
+    const query = parsedUrl.search.toLowerCase();
 
     const [sub, dom, suf] = getDomainParts(domain);
     const entropies = [sub, dom, suf].map(shannonEntropy);
@@ -149,7 +154,7 @@ function extractFullFeatures(domain) {
       path_depth: path.split('/').length - 1,
       unique_chars_url: new Set(url).size,
       unique_chars_dom: new Set(dom).size,
-      levenshtein_to_brand: minLevenshteinDistance(domain, TOP_DOMAINS),
+      levenshtein_to_brand: minLevenshteinDistance(domain, KNOWN_BRANDS),
       is_shortened: URL_SHORTENERS.has(domain),
       is_suspicious_tld: SUSPICIOUS_TLDS.has(suf)
     };

@@ -30,7 +30,7 @@ forest_json = {
 }
 
 #For debugging adding feature names
-# forest_json["feature_names"] = clf.feature_names_in_.tolist()
+forest_json["feature_names"] = clf.feature_names_in_.tolist()
 
 # Save as JSON
 with open("random_forest_model_reduced.json", "w") as f:
