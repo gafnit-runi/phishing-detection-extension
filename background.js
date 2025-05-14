@@ -85,7 +85,6 @@ function runModel(model, features) {
   console.log("Ordered features:", ordered);
   for (const tree of model.trees) {
     const output = runTree(tree, ordered); 
-    console.log("Tree output:", output);
     for (let i = 0; i < model.n_classes; i++) {
       classTotals[i] += output[i]; 
     }
@@ -122,7 +121,7 @@ function detectPhishing(url) {
   console.log("Standardized features:", standardized);
   const { predicted_class, confidence } = runModel(model, standardized);// Returns 0 or 1
   console.log("Predicted class:", predicted_class," Confidence:", confidence);
-  return { prediction: predicted_class === 1 ? "phishing" : "benign", confidence };
+  return { prediction: predicted_class, confidence };
 }
 
 // Handle messages from content script
