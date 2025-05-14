@@ -1,0 +1,77 @@
+{
+  "statistics": {
+    "content_length": {
+      "mean": 156792.55555555556,
+      "median": 66529.0,
+      "std": 258595.30181994353,
+      "min": 29,
+      "max": 1431211,
+      "25th_percentile": 25515.0,
+      "75th_percentile": 165814.0
+    },
+    "num_elements": {
+      "mean": 229.17460317460316,
+      "median": 135.0,
+      "std": 367.6274209507781,
+      "min": 0,
+      "max": 2267,
+      "25th_percentile": 53.0,
+      "75th_percentile": 272.5
+    },
+    "num_links": {
+      "mean": 23.238095238095237,
+      "median": 6.0,
+      "std": 51.76769271675714,
+      "min": 0,
+      "max": 274,
+      "25th_percentile": 0.0,
+      "75th_percentile": 14.5
+    },
+    "num_images": {
+      "mean": 5.396825396825397,
+      "median": 1.0,
+      "std": 20.707283806974065,
+      "min": 0,
+      "max": 154,
+      "25th_percentile": 0.0,
+      "75th_percentile": 2.0
+    },
+    "num_scripts": {
+      "mean": 21.666666666666668,
+      "median": 12.0,
+      "std": 31.133945793059407,
+      "min": 0,
+      "max": 202,
+      "25th_percentile": 6.0,
+      "75th_percentile": 25.5
+    },
+    "num_styles": {
+      "mean": 16.3015873015873,
+      "median": 9.0,
+      "std": 18.313255309214725,
+      "min": 0,
+      "max": 90,
+      "25th_percentile": 4.0,
+      "75th_percentile": 19.5
+    },
+    "num_iframes": {
+      "mean": 0.2222222222222222,
+      "median": 0.0,
+      "std": 0.5219209075058752,
+      "min": 0,
+      "max": 3,
+      "25th_percentile": 0.0,
+      "75th_percentile": 0.0
+    }
+  },
+  "suggested_normalization": {
+    "elements": 135,
+    "links": 14,
+    "images": 2,
+    "scripts": 25,
+    "styles": 19,
+    "iframes_weight": 5,
+    "min_content_length": 25515
+  },
+  "sample_size": 63
+}
