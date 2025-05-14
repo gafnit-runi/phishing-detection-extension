@@ -43,6 +43,12 @@ phishing-detection-extension/
 - `background.js`: Handles message passing and result storage
 - `content_script.js`: Performs phishing detection analysis
 - `popup.html/js`: User interface for viewing results
+- `server.py`: Flask API wrapping the trained ML model
+- `feature_extraction.py`: Domain feature generator (length, entropy, TLD info)
+- `phishing_detector.pkl`: Trained RandomForest model
+- `verified_online.csv`: PhishTank input (phishing)
+- `tranco_list.csv`: Alexa/Tranco list (benign)
+
 
 ### Testing
 
@@ -57,3 +63,18 @@ phishing-detection-extension/
   - Right-click extension icon → Inspect popup
   - Go to `chrome://extensions` → Click "background page" under your extension
   - Use `console.log()` in your code for debugging
+
+
+# Phishing Detector Extension (with ML Model)
+
+## How to Run:
+
+### 1. Install Python dependencies
+pip install -r requirements.txt
+### 2. Start the Flask API server
+python server.py
+### 3. Load Chrome Extension
+- Go to chrome://extensions
+- Enable "Developer mode"
+- Click "Load unpacked" and select the `extension/` folder
+

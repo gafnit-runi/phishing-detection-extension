@@ -1,6 +1,8 @@
 // Background script for the extension
 import { extractFullFeatures } from './feature_extraction.js';
 
+let scaler = null;
+
 chrome.runtime.onInstalled.addListener(() => {
   console.log('Phishing Detection Extension installed');
 });
@@ -34,11 +36,11 @@ async function sendMessageToTab(tabId, message) {
   }
 }
 
-// Load the model
+// Load model
 let model = null;
 async function loadModel() {
   try {
-    const response = await fetch(chrome.runtime.getURL('phishing_detector.json'));
+    const response = await fetch(chrome.runtime.getURL('random_forest_model_reduced.json'));
     model = await response.json();  
     console.log('Model loaded successfully');
     console.log(model);
@@ -46,6 +48,27 @@ async function loadModel() {
   } catch (error) {
     console.error('Error loading model:', error);
   }
+}
+
+// Load scaler
+let scaler = null;
+async function loadScaler() {
+  try {
+    const response = await fetch(chrome.runtime.getURL('scaler_params.json'));
+    scaler = await response.json();
+    console.log('Scaler loaded successfully');
+  } catch (error) {
+    console.error('Error loading scaler:', error);
+  }
+}
+
+function standardizeFeatures(features, means, scales) {
+  const standardized = {};
+  Object.keys(features).forEach((key, i) => {
+    const val = features[key];
+    standardized[key] = (val - means[i]) / scales[i];
+  });
+  return standardized;
 }
 
 function runTree(tree, features) {
@@ -57,37 +80,57 @@ function runTree(tree, features) {
 }
 
 function runModel(model, features) {
-  const votes = new Array(model.n_classes).fill(0);
+  const classTotals = new Array(model.n_classes).fill(0);
+  const ordered = model.feature_names.map(f => features[f]);
+  console.log("Ordered features:", ordered);
   for (const tree of model.trees) {
-    const output = runTree(tree, features);
-    const predicted_class = output.indexOf(Math.max(...output));
-    votes[predicted_class]++;
+    const output = runTree(tree, ordered); 
+    console.log("Tree output:", output);
+    for (let i = 0; i < model.n_classes; i++) {
+      classTotals[i] += output[i]; 
+    }
   }
-  return votes.indexOf(Math.max(...votes));
+
+  const totalVotes = classTotals.reduce((a, b) => a + b, 0);
+  const probabilities = classTotals.map(v => v / totalVotes);
+
+  const predicted_class = classTotals.indexOf(Math.max(...classTotals));
+  const confidence = probabilities[predicted_class];
+
+  return { predicted_class, confidence };
 }
 
 
 // Call loadModel when the extension starts
 loadModel();
 
+loadScaler();
+
 // Model-based detection
-function detectPhishing(domain) {
-  console.log(model);
-  if (!model) {
-    console.error('Model not loaded');
+function detectPhishing(url) {
+  if (!model || !scaler) {
+    console.error('Model or scaler not loaded');
     return "error";
   }
 
-  const features = extractFullFeatures(domain);
-  const prediction = runModel(model, features); // Returns 0 or 1
-  return prediction === 1 ? "phishing" : "benign";
+  const rawFeatures = extractFullFeatures(url);
+  if (!rawFeatures) {
+    return { prediction: "error", confidence: 0 };
+  }
+  console.log("Extracted features:", rawFeatures);
+  const standardized = standardizeFeatures(rawFeatures, scaler.mean, scaler.scale);
+  console.log("Standardized features:", standardized);
+  const { predicted_class, confidence } = runModel(model, standardized);// Returns 0 or 1
+  console.log("Predicted class:", predicted_class," Confidence:", confidence);
+  return { prediction: predicted_class === 1 ? "phishing" : "benign", confidence };
 }
 
 // Handle messages from content script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "check_url") {
-    const prediction = detectPhishing(request.domain);
-    sendResponse({ prediction });
+    console.log("check_url", request.url);
+    const { prediction, confidence } = detectPhishing(request.url);
+    sendResponse({ prediction: prediction, confidence: confidence });
   }
   return true;
 });

@@ -24,74 +24,74 @@ function calculateEntropy(str) {
   return entropy;
 }
 
-// /**
-//  * Detects suspicious dynamic behavior on the page,
-//  * 1. redirects after the initial load.
-//  * 2.Dynamically added <script> or <iframe> elements (common in phishing attacks)
-//  */
+/**
+ * Detects suspicious dynamic behavior on the page,
+ * 1. redirects after the initial load.
+ * 2.Dynamically added <script> or <iframe> elements (common in phishing attacks)
+ */
 
-// function detectByDynamicBehavior() {
-//   return new Promise((resolve) => {
-//     let score = 0;
-//     const reasons = [];
+function detectByDynamicBehavior() {
+  return new Promise((resolve) => {
+    let score = 0;
+    const reasons = [];
 
-//     // Detect redirect using Navigation Timing API
-//     const navEntry = performance.getEntriesByType("navigation")[0];
-//     const currentUrl = window.location.href;
-//     if (navEntry && navEntry.type === "reload" && navEntry.redirectCount > 0) {
-//       if (navEntry?.name) {
-//         try {
-//           const originalUrl = new URL(navEntry.name);
-//           const currentParsed = new URL(currentUrl);
-//           const samePath = originalUrl.origin + originalUrl.pathname === currentParsed.origin + currentParsed.pathname;
-//           const sameQuery = originalUrl.search === currentParsed.search;
-//           if (!samePath || !sameQuery) {
-//             score += 1;
-//             reasons.push(`Redirect detected: ${originalUrl.href} → ${currentParsed.href}`);
-//           }
-//         } catch (err) {
-//           reasons.push("Redirect detection failed (malformed URL).");
-//           reasons.push("Suspicious redirect detected after page load.");
-//         }
-//       }
-//     } 
+    // Detect redirect using Navigation Timing API
+    const navEntry = performance.getEntriesByType("navigation")[0];
+    const currentUrl = window.location.href;
+    if (navEntry && navEntry.type === "reload" && navEntry.redirectCount > 0) {
+      if (navEntry?.name) {
+        try {
+          const originalUrl = new URL(navEntry.name);
+          const currentParsed = new URL(currentUrl);
+          const samePath = originalUrl.origin + originalUrl.pathname === currentParsed.origin + currentParsed.pathname;
+          const sameQuery = originalUrl.search === currentParsed.search;
+          if (!samePath || !sameQuery) {
+            score += 1;
+            reasons.push(`Redirect detected: ${originalUrl.href} → ${currentParsed.href}`);
+          }
+        } catch (err) {
+          reasons.push("Redirect detection failed (malformed URL).");
+          reasons.push("Suspicious redirect detected after page load.");
+        }
+      }
+    } 
 
-//     // Monitor for dynamic script or iframe injections
-//     const observer = new MutationObserver(mutations => {
-//       mutations.forEach(mutation => {
-//         mutation.addedNodes.forEach(node => {
-//           if (node.tagName === "SCRIPT" || node.tagName === "IFRAME") {
-//             score += 1;
-//             reasons.push(`Dynamically injected <${node.tagName.toLowerCase()}> detected.`);
-//           }
-//         });
-//       });
-//     });
+    // Monitor for dynamic script or iframe injections
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+          if (node.tagName === "SCRIPT" || node.tagName === "IFRAME") {
+            score += 1;
+            reasons.push(`Dynamically injected <${node.tagName.toLowerCase()}> detected.`);
+          }
+        });
+      });
+    });
 
-//     // Delay observation start to avoid false positives
-//     setTimeout(() => {
-//       const body = document.body;
-//       if (body) {
-//         observer.observe(body, {
-//           childList: true,
-//           subtree: true
-//         });
+    // Delay observation start to avoid false positives
+    setTimeout(() => {
+      const body = document.body;
+      if (body) {
+        observer.observe(body, {
+          childList: true,
+          subtree: true
+        });
 
-//         // Stop observing after 5s and resolve the result
-//         setTimeout(() => {
-//           observer.disconnect();
-//           console.log("Dynamic Behavior Check Done", { score, reasons });
-//           resolve({
-//             score: score, // update to retuern max score for now
-//             reasons
-//           });
-//         }, 5000);
-//       } else {
-//         resolve({ score: 0, reasons: ["Document body not available"] });
-//       }
-//     }, 2000);
-//   });
-// }
+        // Stop observing after 5s and resolve the result
+        setTimeout(() => {
+          observer.disconnect();
+          console.log("Dynamic Behavior Check Done", { score, reasons });
+          resolve({
+            score: score, // update to retuern max score for now
+            reasons
+          });
+        }, 5000);
+      } else {
+        resolve({ score: 0, reasons: ["Document body not available"] });
+      }
+    }, 2000);
+  });
+}
 
 
 // Static URL Analysis
@@ -493,19 +493,6 @@ function detectByStaticContent() {
   };
 }
 
-
-// async function checkUrlWithModel(domain) {
-//   const response = await fetch("http://localhost:5000/check_url", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({ domain })
-//   });
-
-//   const result = await response.json();
-//   console.log("Test by model", {result });
-//   return result.prediction;  // 'phishing' or 'benign'
-// }
-
 ////////// Main function to calcualte final score for potential phishing //////////
 
 async function checkForPhishing() {
@@ -515,38 +502,31 @@ async function checkForPhishing() {
   
   const { score: urlScore, reasons: urlReasons } = detectByStaticURL(url, domain);
   const { score: contentScore, reasons: contentReasons, contentMetrics } = detectByStaticContent();
-  // const { score: dynamicScore, reasons: dynamicReasons } = await detectByDynamicBehavior();
+  const { score: dynamicScore, reasons: dynamicReasons } = await detectByDynamicBehavior();
 
-  // // Ask background to run the model
-  // const result = await new Promise((resolve) => {
-  //   chrome.runtime.sendMessage({ action: "check_url", domain }, (response) => {
-  //     console.log("Model prediction:", response);
-  //     resolve(response.prediction);
-  //   });
-  // });
+  // Ask background to run the model
+  const result = await new Promise((resolve) => {
+    chrome.runtime.sendMessage({ action: "check_url", url }, (response) => {
+      console.log("Prediction:", response.prediction);
+      console.log("Confidence:", response.confidence);
+      resolve(response);
+    });
+  });
 
-  // // Give +1 if model predicts phishing
-  // const modelScore = result === "phishing" ? 1 : 0;
-  // const modelReasons = result === "phishing" ? ["ML model predicted phishing domain."] : [];
+  // Give +1 if model predicts phishing
+  const modelScore = result === "phishing" ? 1 : 0;
+  const modelReasons = result === "phishing" ? ["ML model predicted phishing domain."] : [];
 
-  // // const result = await checkUrlWithModel(domain);
-  // console.log('urlScore:',urlScore)
-  // console.log('contentScore:',contentScore)
-  // console.log('dynamicScore:',dynamicScore)
-  // // console.log('result:',result)
-  // const riskScore = urlScore + contentScore + dynamicScore + modelScore;
-
-  // // Combine all reasons
-  // const allReasons = [...urlReasons, ...contentReasons, ...dynamicReasons, ...modelReasons];
-
-
+  // const result = await checkUrlWithModel(domain);
   console.log('urlScore:',urlScore)
   console.log('contentScore:',contentScore)
+  console.log('dynamicScore:',dynamicScore)
 
-  const riskScore = urlScore + contentScore;
+  const riskScore = urlScore + contentScore + dynamicScore + modelScore;
 
   // Combine all reasons
-  const allReasons = [...urlReasons, ...contentReasons];
+  const allReasons = [...urlReasons, ...contentReasons, ...dynamicReasons, ...modelReasons];
+
 
   // Expose to window (for Selenium or testing)
   window.riskScore = riskScore;
@@ -581,4 +561,3 @@ window.addEventListener('load', () => {
     console.log('Page fully loaded, starting phishing check');
     checkForPhishing();
   }, 3000);
-});
