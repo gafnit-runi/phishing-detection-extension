@@ -1,5 +1,6 @@
 // Background script for the extension
 import { extractFullFeatures } from './feature_extraction.js';
+
 let scaler = null;
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -35,7 +36,7 @@ async function sendMessageToTab(tabId, message) {
   }
 }
 
-// Load the model
+// Load model
 let model = null;
 async function loadModel() {
   try {
@@ -49,6 +50,8 @@ async function loadModel() {
   }
 }
 
+// Load scaler
+let scaler = null;
 async function loadScaler() {
   try {
     const response = await fetch(chrome.runtime.getURL('scaler_params.json'));
@@ -95,17 +98,16 @@ function runModel(model, features) {
   const confidence = probabilities[predicted_class];
 
   return { predicted_class, confidence };
-  // return votes.indexOf(Math.max(...votes));
 }
 
 
 // Call loadModel when the extension starts
 loadModel();
-loadScaler();extractFullFeatures
+
+loadScaler();
 
 // Model-based detection
 function detectPhishing(url) {
-  console.log(model);
   if (!model || !scaler) {
     console.error('Model or scaler not loaded');
     return "error";

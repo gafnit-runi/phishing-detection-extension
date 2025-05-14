@@ -1,0 +1,1102 @@
+[
+  {
+    "url": "https://accounts.google.com/v3/signin/identifier?ifkv=ASKV5Mg0WHVb2iekFZ3NqDYorvp1cYC8Ux4SCq0FYdR2Ym2ObKktHsmVVMAV_TwL22QFaXZhLI1o&flowName=WebLiteSignIn&flowEntry=ServiceLogin&dsh=S1882218127%3A1746723937068517",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 524629,
+      "num_elements": 179,
+      "num_links": 6,
+      "num_images": 1,
+      "num_scripts": 7,
+      "num_styles": 3,
+      "num_iframes": 0,
+      "complexity_score": 0.3730523717807037
+    }
+  },
+  {
+    "url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Den%26next%3D%252F%26feature%3Dshortcut&hl=en&ifkv=ASKV5Mi3LIbxDsvJhlQi6_S2gPf4GahwocRbg5jaL6ukllnZYWiN7fOvMpy_6zTpnvAu4WkInlzpwg&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&dsh=S2063794229%3A1746723938396806",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 525497,
+      "num_elements": 179,
+      "num_links": 6,
+      "num_images": 1,
+      "num_scripts": 7,
+      "num_styles": 3,
+      "num_iframes": 0,
+      "complexity_score": 0.3730523717807037
+    }
+  },
+  {
+    "url": "https://www.facebook.com/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 65927,
+      "num_elements": 190,
+      "num_links": 42,
+      "num_images": 2,
+      "num_scripts": 18,
+      "num_styles": 13,
+      "num_iframes": 0,
+      "complexity_score": 0.9403297443507729
+    }
+  },
+  {
+    "url": "https://auth.wikimedia.org/hewiki/wiki/%D7%9E%D7%99%D7%95%D7%97%D7%93:%D7%9B%D7%A0%D7%99%D7%A1%D7%94_%D7%9C%D7%97%D7%A9%D7%91%D7%95%D7%9F?useformat=desktop&usesul3=1&returnto=Main_Page&centralauthLoginToken=a8b0c46a1dffde38482caf7bd674e6ad",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 46955,
+      "num_elements": 408,
+      "num_links": 61,
+      "num_images": 5,
+      "num_scripts": 5,
+      "num_styles": 8,
+      "num_iframes": 0,
+      "complexity_score": 1.4507633165987812
+    }
+  },
+  {
+    "url": "https://www.instagram.com/login/",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 415897,
+      "num_elements": 111,
+      "num_links": 0,
+      "num_images": 2,
+      "num_scripts": 75,
+      "num_styles": 18,
+      "num_iframes": 0,
+      "complexity_score": 0.8001878690284489
+    }
+  },
+  {
+    "url": "https://login.live.com/login.srf?wa=wsignin1.0&rpsnv=175&id=264960&wreply=https%3a%2f%2fwww.bing.com%2fsecure%2fPassport.aspx%3fedge_suppress_profile_switch%3d1%26requrl%3dhttps%253a%252f%252fwww.bing.com%252f%253ftoWww%253d1%2526redig%253d24890082A79545B8830BBBCAFD3599E4%2526wlexpsignin%253d1%26sig%3d32643357AB4C69B50E8926B1AADC685E%26nopa%3d2&wp=MBI_SSL&lc=1033&CSRFToken=5e9345da-3f6e-4ff8-b6bb-2b3b3c823d03&cobrandid=c333cba8-c15c-4458-b082-7c8ce81bee85&nopa=2",
+    "score": 1,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.17, expected > 0.3)"
+    ],
+    "metrics": {
+      "content_length": 29427,
+      "num_elements": 39,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 8,
+      "num_styles": 12,
+      "num_iframes": 0,
+      "complexity_score": 0.17152442297369833
+    }
+  },
+  {
+    "url": "https://www.reddit.com/login/?rdt=55747",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 352742,
+      "num_elements": 154,
+      "num_links": 1,
+      "num_images": 1,
+      "num_scripts": 19,
+      "num_styles": 13,
+      "num_iframes": 0,
+      "complexity_score": 0.4374430341111217
+    }
+  },
+  {
+    "url": "https://x.com/i/flow/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 257388,
+      "num_elements": 166,
+      "num_links": 6,
+      "num_images": 1,
+      "num_scripts": 41,
+      "num_styles": 58,
+      "num_iframes": 0,
+      "complexity_score": 0.9471174997105661
+    }
+  },
+  {
+    "url": "https://web.whatsapp.com/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 226927,
+      "num_elements": 125,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 76,
+      "num_styles": 19,
+      "num_iframes": 0,
+      "complexity_score": 0.6885042046877795
+    }
+  },
+  {
+    "url": "https://www.amazon.com/ap/signin?openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2F%3Fref_%3Dnav_ya_signin&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.assoc_handle=usflex&openid.mode=checkid_setup&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 118981,
+      "num_elements": 139,
+      "num_links": 12,
+      "num_images": 2,
+      "num_scripts": 22,
+      "num_styles": 3,
+      "num_iframes": 0,
+      "complexity_score": 0.5435014155957606
+    }
+  },
+  {
+    "url": "https://login.yahoo.com/",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 41479,
+      "num_elements": 346,
+      "num_links": 7,
+      "num_images": 5,
+      "num_scripts": 8,
+      "num_styles": 13,
+      "num_iframes": 1,
+      "complexity_score": 1.7437974277204173
+    }
+  },
+  {
+    "url": "https://weather.com/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 754265,
+      "num_elements": 571,
+      "num_links": 250,
+      "num_images": 6,
+      "num_scripts": 15,
+      "num_styles": 23,
+      "num_iframes": 0,
+      "complexity_score": 3.7050956184943113
+    }
+  },
+  {
+    "url": "https://duckduckgo.com/?q=login&&rpl=1",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 29991,
+      "num_elements": 91,
+      "num_links": 3,
+      "num_images": 0,
+      "num_scripts": 25,
+      "num_styles": 14,
+      "num_iframes": 0,
+      "complexity_score": 0.3633713281340449
+    }
+  },
+  {
+    "url": "https://www.tiktok.com/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 229386,
+      "num_elements": 233,
+      "num_links": 5,
+      "num_images": 0,
+      "num_scripts": 25,
+      "num_styles": 52,
+      "num_iframes": 0,
+      "complexity_score": 0.8044320250913032
+    }
+  },
+  {
+    "url": "https://www.linkedin.com/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 52156,
+      "num_elements": 388,
+      "num_links": 13,
+      "num_images": 0,
+      "num_scripts": 8,
+      "num_styles": 40,
+      "num_iframes": 0,
+      "complexity_score": 0.8609274520328797
+    }
+  },
+  {
+    "url": "https://www.netflix.com/il-en/login",
+    "score": 1,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.12, expected > 0.3)"
+    ],
+    "metrics": {
+      "content_length": 194600,
+      "num_elements": 43,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 9,
+      "num_styles": 4,
+      "num_iframes": 0,
+      "complexity_score": 0.12322419037394883
+    }
+  },
+  {
+    "url": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=4765445b-32c6-49b0-83e6-1d93765276ca&redirect_uri=https%3A%2F%2Fwww.office.com%2Flandingv2&response_type=code%20id_token&scope=openid%20profile%20https%3A%2F%2Fwww.office.com%2Fv2%2FOfficeHome.All&response_mode=form_post&nonce=638823208269707366.ODdiZmYzZDYtZDlhNy00N2U4LTlmZjUtMjgwNGZkOTY3NzYxNDZkOGMwNDAtNjNkNS00NWJjLWFmZGQtMjc5MTFmNTVhODBk&ui_locales=en-US&mkt=en-US&client-request-id=fb65bf96-8ae9-4cde-b24e-b9ce7b0d3a89&state=bLQrRmHQthbLA35sfcVSctru5v4nlWFSmPvqnWc4kClKrqMNIJiJUuvzgA1EZ9ILrdkFzmwkwjgwrFCU9goEwFRiFGeTrdo-PkfupzwATOPs9dSSx3bd2s8CAWKsbCS_bzb4X-PZra-X-0JJruE4uLk4bepHNYJGBLwPv9typ7kESPGxUfETHrxWy6Le2d8E2KXfyFJmNuTmXtfMyO0rsg2kJJ_GTQbO0XZy0HYo0EwBMBQQhyUu_ic7XaqCtnAJhNBXkbBryeId49hO_AFbDg&x-client-SKU=ID_NET8_0&x-client-ver=8.5.0.0",
+    "score": 1,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.05, expected > 0.3)"
+    ],
+    "metrics": {
+      "content_length": 21480,
+      "num_elements": 19,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 5,
+      "num_styles": 0,
+      "num_iframes": 0,
+      "complexity_score": 0.047325102880658436
+    }
+  },
+  {
+    "url": "https://www.twitch.tv/login",
+    "score": 1,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.27, expected > 0.3)"
+    ],
+    "metrics": {
+      "content_length": 139526,
+      "num_elements": 50,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 29,
+      "num_styles": 8,
+      "num_iframes": 0,
+      "complexity_score": 0.27052245482197174
+    }
+  },
+  {
+    "url": "https://m.vk.com/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 109175,
+      "num_elements": 104,
+      "num_links": 0,
+      "num_images": 5,
+      "num_scripts": 8,
+      "num_styles": 7,
+      "num_iframes": 0,
+      "complexity_score": 0.5493871891214887
+    }
+  },
+  {
+    "url": "https://e.mail.ru/login?from=portal",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 178610,
+      "num_elements": 141,
+      "num_links": 20,
+      "num_images": 5,
+      "num_scripts": 10,
+      "num_styles": 9,
+      "num_iframes": 0,
+      "complexity_score": 0.8091353288497363
+    }
+  },
+  {
+    "url": "https://account.samsung.com/iam/oauth2/authorize?client_id=ae428twvcn&redirect_uri=https%3A%2F%2Fwww.samsung.com%2Faemapi%2Fv6%2Fdata-login%2FafterLogin.il.json&response_type=code&scope=&state=GLB02nzgy8&locale=he-IL",
+    "score": 2,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.05, expected > 0.3)",
+      "Suspiciously short page content (1707 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 1707,
+      "num_elements": 14,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 6,
+      "num_styles": 2,
+      "num_iframes": 0,
+      "complexity_score": 0.04978350331007336
+    }
+  },
+  {
+    "url": "https://www.pinterest.com/login/",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 418557,
+      "num_elements": 140,
+      "num_links": 1,
+      "num_images": 0,
+      "num_scripts": 42,
+      "num_styles": 50,
+      "num_iframes": 0,
+      "complexity_score": 0.7494890172923704
+    }
+  },
+  {
+    "url": "https://auth.fandom.com/signin?flow=bd83bbdc-fd44-4863-85bd-c17296151c81",
+    "score": 1,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.29, expected > 0.3)"
+    ],
+    "metrics": {
+      "content_length": 33235,
+      "num_elements": 115,
+      "num_links": 6,
+      "num_images": 0,
+      "num_scripts": 12,
+      "num_styles": 7,
+      "num_iframes": 0,
+      "complexity_score": 0.2945275909612369
+    }
+  },
+  {
+    "url": "https://he.quora.com/",
+    "score": 1,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.27, expected > 0.3)"
+    ],
+    "metrics": {
+      "content_length": 77334,
+      "num_elements": 64,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 21,
+      "num_styles": 12,
+      "num_iframes": 0,
+      "complexity_score": 0.269466809804974
+    }
+  },
+  {
+    "url": "https://authx.globoid.globo.com/6870/login?url=https%3A%2F%2Fgoidc.globo.com%2Fauth%2Frealms%2Fglobo.com%2Fprotocol%2Fopenid-connect%2Fconfirm%3Fclient_id%3Dbarra%40apps.globoid%26response_type%3Dcode%26state%3D8b7d1312-9ed4-419c-9e7f-b9f72200d46a%26tab_id%3DDVA1836yeAh%26prompt%3Dnone%26scope%3Dopenid+profile%26response_mode%3Dfragment%26nonce%3D2ed9e117-d53e-4968-88f6-beffba58eaef%26code_challenge_method%3DS256%26code_challenge%3D9sAvI-V5KSpirHIa49QGAahzOSQHu6eKpVGxEcaNU-Y%26redirect_uri%3Dhttps%3A%2F%2Fwww.globo.com%2Flogin-callback.ghtml",
+    "score": 2,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.03, expected > 0.3)",
+      "Suspiciously short page content (1028 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 1028,
+      "num_elements": 12,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 3,
+      "num_styles": 1,
+      "num_iframes": 0,
+      "complexity_score": 0.02900697799248524
+    }
+  },
+  {
+    "url": "https://www.roblox.com/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 74239,
+      "num_elements": 345,
+      "num_links": 16,
+      "num_images": 8,
+      "num_scripts": 122,
+      "num_styles": 46,
+      "num_iframes": 1,
+      "complexity_score": 2.9118010167029773
+    }
+  },
+  {
+    "url": "https://m.kwai.com/users/login",
+    "score": 2,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.00, expected > 0.3)",
+      "Suspiciously short page content (125 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 125,
+      "num_elements": 0,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 0,
+      "num_styles": 0,
+      "num_iframes": 0,
+      "complexity_score": 0.0
+    }
+  },
+  {
+    "url": "https://telegram.org/login",
+    "score": 1,
+    "reasons": [
+      "Suspiciously short page content (19530 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 19530,
+      "num_elements": 298,
+      "num_links": 61,
+      "num_images": 11,
+      "num_scripts": 3,
+      "num_styles": 7,
+      "num_iframes": 0,
+      "complexity_score": 1.388723016850326
+    }
+  },
+  {
+    "url": "https://edition.cnn.com/account/log-in",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 1431211,
+      "num_elements": 264,
+      "num_links": 44,
+      "num_images": 0,
+      "num_scripts": 9,
+      "num_styles": 12,
+      "num_iframes": 1,
+      "complexity_score": 1.6732673423636764
+    }
+  },
+  {
+    "url": "https://account.bbc.com/auth/identifier/signin?realm=%2F&clientId=Account&ptrt=https%3A%2F%2Fwww.bbc.com%2F&userOrigin=BBCS_BBC&purpose=single-entry&isCasso=false&action=sign-in&redirectUri=https%3A%2F%2Fsession.bbc.com%2Fsession%2Fcallback%3Frealm%3D%2F&service=IdSignInService&nonce=suMhJzDX-SAE5c1AQfEL6CnChGfl6EcQamz4",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 153464,
+      "num_elements": 135,
+      "num_links": 11,
+      "num_images": 1,
+      "num_scripts": 24,
+      "num_styles": 16,
+      "num_iframes": 0,
+      "complexity_score": 0.5654518329070759
+    }
+  },
+  {
+    "url": "https://discord.com/login",
+    "score": 2,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.06, expected > 0.3)",
+      "Suspiciously short page content (5246 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 5246,
+      "num_elements": 23,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 6,
+      "num_styles": 2,
+      "num_iframes": 0,
+      "complexity_score": 0.057190910717480774
+    }
+  },
+  {
+    "url": "https://zoom.us/login",
+    "score": 2,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.00, expected > 0.3)",
+      "Suspiciously short page content (29 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 29,
+      "num_elements": 0,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 0,
+      "num_styles": 0,
+      "num_iframes": 0,
+      "complexity_score": 0.0
+    }
+  },
+  {
+    "url": "https://signin.ebay.com/ws/eBayISAPI.dll?SignIn&sgfl=gh&ru=https%3A%2F%2Fwww.ebay.com%2F",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 31173,
+      "num_elements": 135,
+      "num_links": 12,
+      "num_images": 0,
+      "num_scripts": 24,
+      "num_styles": 9,
+      "num_iframes": 0,
+      "complexity_score": 0.4550866723500995
+    }
+  },
+  {
+    "url": "https://www.nytimes.com/account/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 84729,
+      "num_elements": 38,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 16,
+      "num_styles": 6,
+      "num_iframes": 1,
+      "complexity_score": 1.0047951332975489
+    }
+  },
+  {
+    "url": "https://auth.indiatoday.in/user/login?ReturnTo=https%3A%2F%2Fauth.indiatoday.in%2Fsimplesaml%2Fmodule.php%2Fsso%2Fresume.php%3FState%3D_a61c7eaaa46db939e17c4f9fbd9b63962ad8544a29",
+    "score": 1,
+    "reasons": [
+      "Suspiciously short page content (10692 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 10692,
+      "num_elements": 96,
+      "num_links": 11,
+      "num_images": 6,
+      "num_scripts": 6,
+      "num_styles": 7,
+      "num_iframes": 0,
+      "complexity_score": 0.5658665656278615
+    }
+  },
+  {
+    "url": "https://accounts.spotify.com/login?continue=https%3A%2F%2Fwww.spotify.com%2Faccount%2Foverview%2F&_locale=he-IL",
+    "score": 2,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.03, expected > 0.3)",
+      "Suspiciously short page content (7462 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 7462,
+      "num_elements": 17,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 1,
+      "num_styles": 2,
+      "num_iframes": 0,
+      "complexity_score": 0.030030416890320273
+    }
+  },
+  {
+    "url": "https://turbopages.org/account/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 83980,
+      "num_elements": 74,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 26,
+      "num_styles": 12,
+      "num_iframes": 0,
+      "complexity_score": 0.3075326534263732
+    }
+  },
+  {
+    "url": "https://auth.openai.com/log-in",
+    "score": 2,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.02, expected > 0.3)",
+      "Suspiciously short page content (7356 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 7356,
+      "num_elements": 16,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 1,
+      "num_styles": 1,
+      "num_iframes": 0,
+      "complexity_score": 0.023410270173555195
+    }
+  },
+  {
+    "url": "https://www.cricbuzz.com/premium-subscription/user/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 32114,
+      "num_elements": 166,
+      "num_links": 3,
+      "num_images": 4,
+      "num_scripts": 13,
+      "num_styles": 9,
+      "num_iframes": 1,
+      "complexity_score": 1.4487443823476787
+    }
+  },
+  {
+    "url": "https://secure8.store.apple.com/shop/signIn?ssi=4AAABlr46GrIBIB6StBL2iA112aRh9erFpBSFFIWlz5IDmOkt9-GtRAUAAAAAGWh0dHBzOi8vd3d3LmFwcGxlLmNvbS98fHwAAgHvhHb6hz87GLugZygXIpt5WWskCb1_LW5KRppxxDCQJA",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 142046,
+      "num_elements": 495,
+      "num_links": 85,
+      "num_images": 2,
+      "num_scripts": 28,
+      "num_styles": 6,
+      "num_iframes": 0,
+      "complexity_score": 1.6805152979066023
+    }
+  },
+  {
+    "url": "https://nid.naver.com/nidlogin.login?mode=form&url=https://www.naver.com/",
+    "score": 1,
+    "reasons": [
+      "Suspiciously short page content (18836 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 18836,
+      "num_elements": 190,
+      "num_links": 18,
+      "num_images": 0,
+      "num_scripts": 5,
+      "num_styles": 6,
+      "num_iframes": 0,
+      "complexity_score": 0.35455990232915496
+    }
+  },
+  {
+    "url": "https://sso.passport.yandex.ru/push?uuid=e319f194-c0d0-4307-8666-2743b98b178c&retpath=https%3A%2F%2Fdzen.ru%2Flogin%3Fis_autologin_ya%3Dtrue",
+    "score": 2,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.01, expected > 0.3)",
+      "Suspiciously short page content (2109 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 2109,
+      "num_elements": 2,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 1,
+      "num_styles": 0,
+      "num_iframes": 0,
+      "complexity_score": 0.006090534979423868
+    }
+  },
+  {
+    "url": "https://auth.services.adobe.com/en_US/index.html?callback=https%3A%2F%2Fims-na1.adobelogin.com%2Fims%2Fadobeid%2Fhomepage_milo%2FAdobeID%2Ftoken%3Fredirect_uri%3Dhttps%253A%252F%252Fwww.adobe.com%252Fhome%2523old_hash%253D%2526from_ims%253Dtrue%253Fclient_id%253Dhomepage_milo%2526api%253Dauthorize%2526scope%253DAdobeID%252Copenid%252Cgnav%252Cpps.read%252Cfirefly_api%252Cadditional_info.roles%252Cread_organizations%252Caccount_cluster.read%26state%3D%257B%2522jslibver%2522%253A%2522v2-v0.46.0-19-g35c1ff9%2522%252C%2522nonce%2522%253A%25222269094514394296%2522%257D%26code_challenge_method%3Dplain%26use_ms_for_expiry%3Dtrue&client_id=homepage_milo&scope=AdobeID%2Copenid%2Cgnav%2Cpps.read%2Cfirefly_api%2Cadditional_info.roles%2Cread_organizations%2Caccount_cluster.read&state=%7B%22jslibver%22%3A%22v2-v0.46.0-19-g35c1ff9%22%2C%22nonce%22%3A%222269094514394296%22%7D&relay=a2c730be-d740-4d5c-80e7-9ac77c01009a&locale=en_US&flow_type=token&idp_flow_type=login&s_p=google%2Cfacebook%2Capple%2Cmicrosoft%2Cline%2Ckakao&response_type=token&code_challenge_method=plain&redirect_uri=https%3A%2F%2Fwww.adobe.com%2Fhome%23old_hash%3D%26from_ims%3Dtrue%3Fclient_id%3Dhomepage_milo%26api%3Dauthorize%26scope%3DAdobeID%2Copenid%2Cgnav%2Cpps.read%2Cfirefly_api%2Cadditional_info.roles%2Cread_organizations%2Caccount_cluster.read&use_ms_for_expiry=true#/",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 178164,
+      "num_elements": 101,
+      "num_links": 5,
+      "num_images": 1,
+      "num_scripts": 5,
+      "num_styles": 7,
+      "num_iframes": 0,
+      "complexity_score": 0.30087593276709507
+    }
+  },
+  {
+    "url": "https://www.imdb.com/",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 1116295,
+      "num_elements": 2267,
+      "num_links": 138,
+      "num_images": 59,
+      "num_scripts": 202,
+      "num_styles": 27,
+      "num_iframes": 1,
+      "complexity_score": 9.933675654910381
+    }
+  },
+  {
+    "url": "https://stackoverflow.com/users/login?ssrc=head&returnurl=https%3a%2f%2fstackoverflow.com%2fquestions",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 63313,
+      "num_elements": 331,
+      "num_links": 41,
+      "num_images": 1,
+      "num_scripts": 37,
+      "num_styles": 9,
+      "num_iframes": 0,
+      "complexity_score": 1.0827131550419418
+    }
+  },
+  {
+    "url": "https://github.com/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 41977,
+      "num_elements": 281,
+      "num_links": 11,
+      "num_images": 0,
+      "num_scripts": 51,
+      "num_styles": 39,
+      "num_iframes": 0,
+      "complexity_score": 0.9628798164461706
+    }
+  },
+  {
+    "url": "https://wordpress.com/log-in/",
+    "score": 2,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.01, expected > 0.3)",
+      "Suspiciously short page content (564 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 564,
+      "num_elements": 8,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 0,
+      "num_styles": 0,
+      "num_iframes": 0,
+      "complexity_score": 0.006584362139917695
+    }
+  },
+  {
+    "url": "https://account.booking.com/sign-in?op_token=EgVvYXV0aCKuBQoUdk8xS2Jsazd4WDl0VW4yY3BaTFMSCWF1dGhvcml6ZRo1aHR0cHM6Ly9zZWN1cmUuYm9va2luZy5jb20vbG9naW4uaHRtbD9vcD1vYXV0aF9yZXR1cm4qzQRVcG9ESS05azlkN3lCNjRhQWgxTDVLX3MxSGRZVWFHYkRWemlRY1Z1S1RHejlBVGJDUGlEYUx6a2NHVnhkZFlxX21xWHhjUEU0ckE4c2d5alExNEVhcGhiVkI3akpzXzNoZkVXdHlxY1lYWUpoZEhJYldqOU5XNDdaLVBRbmt5elRjU0Rva1B0bFpDTV9jVTRHNm41U1R1WG1UN3JlZjFWaS1wSm42SXhTLXpYN3dUOVpsdWZhc0ZFQk5IWnpIYzQxS01wMW9SWmF4ZEN6RDJjV1U5Q3d6UXRrNlRVUXZROXF2d045UXI4U0NRUEpUNV9BYmNGMW9xc3NXRzFzVWNqbk1WV2VlX09vaFpieWNJVW1yelgxN1J4VXBJU21nR3o4Vm5Gd1BGTEN5WXZKMXhFWmhDY2VxblZCWjNCbHE4MTZvYTNzQTNJZ0QySmI3ajJXeE4ybUhaUTNUQktvd2xjUlVKS01NQUxqWGkyYmhsaWNnNWhONG9pLXlSTU9pQzdmTmJpcUszTmNrMWZHQTkwTzNWSnRfdEg0NFg5cGJBTzFGdG5tSUtyOEZ3QkxYdVlocFV6NEdvNnpVdnJwSmNxZWlicUxnZElEU0VnLTNTWk9USExMaUtoajBjU0sxZ1cxZDRIemdkMUpxMXNJY1htOWtGbHY5TzN5aVBPMmdsSDhMNGN0NkszbFp6aDNwMmRwQnZOZGxSbzRqeVF2WEN0M2NqdVoxaz0qZXlKcFpDSTZJblJ5WVhabGJHeGxjbDlvWldGa1pYSWlmUT09QgRjb2RlKjIIjsgSMOm16-Ky3Cc6AEIAWJXIgPLrMpIBEHRyYXZlbGxlcl9oZWFkZXKaAQVpbmRleA",
+    "score": 2,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.04, expected > 0.3)",
+      "Suspiciously short page content (2310 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 2310,
+      "num_elements": 14,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 4,
+      "num_styles": 1,
+      "num_iframes": 0,
+      "complexity_score": 0.035097512971909106
+    }
+  },
+  {
+    "url": "https://secure.indeed.com/auth?hl=en_IL&co=IL&continue=https%3A%2F%2Fil.indeed.com%2F%3Fr%3Dus&tmpl=desktop&from=gnav-util-homepage&jsContinue=https%3A%2F%2Fonboarding.indeed.com%2Fonboarding%3Fhl%3Den_IL%26co%3DIL%26from%3Dgnav-homepage&empContinue=https%3A%2F%2Faccount.indeed.com%2Fmyaccess",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 41166,
+      "num_elements": 54,
+      "num_links": 13,
+      "num_images": 2,
+      "num_scripts": 2,
+      "num_styles": 1,
+      "num_iframes": 0,
+      "complexity_score": 0.3402529127593066
+    }
+  },
+  {
+    "url": "https://www.paypal.com/signin",
+    "score": 1,
+    "reasons": [
+      "Suspiciously short page content (7815 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 7815,
+      "num_elements": 51,
+      "num_links": 0,
+      "num_images": 1,
+      "num_scripts": 7,
+      "num_styles": 3,
+      "num_iframes": 1,
+      "complexity_score": 0.8126999463231348
+    }
+  },
+  {
+    "url": "https://www.tumblr.com/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 64267,
+      "num_elements": 138,
+      "num_links": 13,
+      "num_images": 0,
+      "num_scripts": 5,
+      "num_styles": 20,
+      "num_iframes": 0,
+      "complexity_score": 0.442131603043794
+    }
+  },
+  {
+    "url": "https://ok.ru/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 197814,
+      "num_elements": 627,
+      "num_links": 33,
+      "num_images": 23,
+      "num_scripts": 36,
+      "num_styles": 56,
+      "num_iframes": 1,
+      "complexity_score": 4.004943797164599
+    }
+  },
+  {
+    "url": "https://passport.weibo.com/visitor/visitor?entry=miniblog&a=enter&url=https%3A%2F%2Fweibo.com%2Flogin&domain=.weibo.com&sudaref=https%3A%2F%2Fweibo.com%2F%3F&ua=php-sso_sdk_client-0.6.36&_rand=1746724536.4482",
+    "score": 2,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.02, expected > 0.3)",
+      "Suspiciously short page content (8418 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 8418,
+      "num_elements": 8,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 2,
+      "num_styles": 0,
+      "num_iframes": 0,
+      "complexity_score": 0.015473251028806584
+    }
+  },
+  {
+    "url": "https://www.dropbox.com/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 69641,
+      "num_elements": 113,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 28,
+      "num_styles": 60,
+      "num_iframes": 0,
+      "complexity_score": 0.7065933082841296
+    }
+  },
+  {
+    "url": "https://archive.org/account/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 136647,
+      "num_elements": 581,
+      "num_links": 131,
+      "num_images": 14,
+      "num_scripts": 12,
+      "num_styles": 20,
+      "num_iframes": 0,
+      "complexity_score": 3.065866776125372
+    }
+  },
+  {
+    "url": "https://auth.huffpost.com/login?state=hKFo2SBNZlBNOGdWZXF2MUNhWkhiQkNjeDYyZXZqZ1RDZFVQeqFupWxvZ2luo3RpZNkgWG1oSEY0VUpXZHk2SU1zdzlIY0FiQkdyMExua24yZWqjY2lk2SBLb0R1eTdqRlE2dUJVM3ZCTXVxUG1BT2Y4S2t3UHo5Qw&client=KoDuy7jFQ6uBU3vBMuqPmAOf8KkwPz9C&protocol=oauth2&redirect_uri=https%3A%2F%2Flogin.huffpost.com%2Fcallback&response_type=code&scope=openid%20profile%20email%20offline_access",
+    "score": 2,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.02, expected > 0.3)",
+      "Suspiciously short page content (5843 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 5843,
+      "num_elements": 10,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 2,
+      "num_styles": 1,
+      "num_iframes": 0,
+      "complexity_score": 0.02291644301306137
+    }
+  },
+  {
+    "url": "https://www.businessinsider.com/?show-login&IR=C",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 530274,
+      "num_elements": 1772,
+      "num_links": 274,
+      "num_images": 156,
+      "num_scripts": 30,
+      "num_styles": 86,
+      "num_iframes": 3,
+      "complexity_score": 18.632508183090735
+    }
+  },
+  {
+    "url": "https://medium.com/account/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 81875,
+      "num_elements": 368,
+      "num_links": 43,
+      "num_images": 9,
+      "num_scripts": 42,
+      "num_styles": 21,
+      "num_iframes": 0,
+      "complexity_score": 1.8106766968730594
+    }
+  },
+  {
+    "url": "https://profile.theguardian.com/signin?INTCMP=DOTCOM_NEWHEADER_SIGNIN&ABCMP=ab-sign-in&componentEventParams=componentType%3Didentityauthentication%26componentId%3Dguardian_signin_header",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 36060,
+      "num_elements": 117,
+      "num_links": 10,
+      "num_images": 0,
+      "num_scripts": 8,
+      "num_styles": 30,
+      "num_iframes": 0,
+      "complexity_score": 0.48024533484891546
+    }
+  },
+  {
+    "url": "https://www.washingtonpost.com/subscribe/signin/?next_url=https%3A%2F%2Fwww.washingtonpost.com%2F&nid=top_pb_signin&arcId=&account_location=ONSITE_HEADER_HOMEPAGE&itid=nav_sign_in",
+    "score": 1,
+    "reasons": [
+      "Error analyzing page: HTTPSConnectionPool(host='www.washingtonpost.com', port=443): Read timed out. (read timeout=30)"
+    ],
+    "metrics": {}
+  },
+  {
+    "url": "https://login.usatoday.com/USAT-GUP/authenticate/?success-url=https%3A%2F%2Fwww.usatoday.com%2F&cancel-url=https%3A%2F%2Fwww.usatoday.com%2F&from-state=returning-user-get-redirect&cookies=",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 79674,
+      "num_elements": 88,
+      "num_links": 11,
+      "num_images": 2,
+      "num_scripts": 3,
+      "num_styles": 4,
+      "num_iframes": 0,
+      "complexity_score": 0.3829191794807027
+    }
+  },
+  {
+    "url": "https://www.reuters.com/account/login",
+    "score": 2,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.05, expected > 0.3)",
+      "Suspiciously short page content (865 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 865,
+      "num_elements": 17,
+      "num_links": 0,
+      "num_images": 0,
+      "num_scripts": 2,
+      "num_styles": 4,
+      "num_iframes": 0,
+      "complexity_score": 0.04606906423331544
+    }
+  },
+  {
+    "url": "https://www.bloomberg.com/account/login",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 77148,
+      "num_elements": 45,
+      "num_links": 0,
+      "num_images": 1,
+      "num_scripts": 18,
+      "num_styles": 15,
+      "num_iframes": 1,
+      "complexity_score": 1.1577697262479871
+    }
+  },
+  {
+    "url": "https://login.publicmediasignin.org/f29e2df8-7cf0-4741-939b-dc9e9555f527/auth-ui/v2/login?__aic_csrf=smL5x9ryBmdHOmYI&client_id=00ac4575-e809-4694-bb71-93b9d9ebb2f3&code_challenge=ewdJoL3ztq8NoC9J3s68S19CrqjTaOCvkxBFdTxkoIM&code_challenge_method=S256&redirect_uri=https%3A%2F%2Fauthorization.api.npr.org%2Fv2%2Flogin%2Fsuccess&response_type=code&scope=openid+email+profile&state=2064453827%3A1902106836",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 33977,
+      "num_elements": 441,
+      "num_links": 28,
+      "num_images": 1,
+      "num_scripts": 6,
+      "num_styles": 4,
+      "num_iframes": 0,
+      "complexity_score": 0.8599767926494271
+    }
+  },
+  {
+    "url": "https://www.theverge.com/auth/login",
+    "score": 1,
+    "reasons": [
+      "Suspiciously short page content (20289 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 20289,
+      "num_elements": 154,
+      "num_links": 10,
+      "num_images": 1,
+      "num_scripts": 24,
+      "num_styles": 32,
+      "num_iframes": 0,
+      "complexity_score": 0.5529098123414692
+    }
+  },
+  {
+    "url": "https://login.engadget.com/?src=engadget&client_id=dj0yJmk9eGJzZmtrM2xWS2F2JmQ9WVdrOVdsWmpkelZrTldFbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD02Yg--&crumb=t8Az2goaAws&redirect_uri=https%3A%2F%2Foidc.engadget.com%2Fcallback&pspid=1197802876&activity=header&done=https%3A%2F%2Fapi.login.engadget.com%2Foauth2%2Fauthorize%3Factivity%3Dheader%26client_id%3Ddj0yJmk9eGJzZmtrM2xWS2F2JmQ9WVdrOVdsWmpkelZrTldFbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD02Yg--%26nonce%3Di9ZzCylosj3bK0r0gnrG2YUSrKyFDnME%26pspid%3D1197802876%26redirect_uri%3Dhttps%253A%252F%252Foidc.engadget.com%252Fcallback%26response_type%3Dcode%26scope%3Dopenid%2Bguce-w%2Bopenid2%2Bsdps-r%26src%3Dengadget%26state%3DeyJhbGciOiJSUzI1NiIsImtpZCI6IjZmZjk0Y2RhZDExZTdjM2FjMDhkYzllYzNjNDQ4NDRiODdlMzY0ZjcifQ.eyJyZWRpcmVjdFVyaSI6Imh0dHBzOi8vd3d3LmVuZ2FkZ2V0LmNvbSJ9.dfixXQp85f6ALnoEXxhwgb82Mi2Wg4TMkmCqsAgMMcp2vgnmUZvxAgAU_OBYpnuKQg19VWIAI9e5KQCI6CsKikuHsDnTDr8q7vY-BdMnkVXZIsGNbP06abmkEc2Fb1kKT7bssC_1VYCUTR2Rae0iWzfTLCUiZyHqxERnc5sEqvA",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 40486,
+      "num_elements": 331,
+      "num_links": 3,
+      "num_images": 3,
+      "num_scripts": 6,
+      "num_styles": 14,
+      "num_iframes": 1,
+      "complexity_score": 1.5463960194920696
+    }
+  },
+  {
+    "url": "https://techcrunch.com/wp-login.php",
+    "score": 2,
+    "reasons": [
+      "Suspiciously simple page structure (complexity score: 0.17, expected > 0.3)",
+      "Suspiciously short page content (5609 characters, expected > 20412.0)"
+    ],
+    "metrics": {
+      "content_length": 5609,
+      "num_elements": 55,
+      "num_links": 3,
+      "num_images": 0,
+      "num_scripts": 14,
+      "num_styles": 7,
+      "num_iframes": 0,
+      "complexity_score": 0.17159883384378982
+    }
+  },
+  {
+    "url": "https://id.condenast.com/interaction/6Ts1dF7jGc8Uy0Yo-0r3B/email?_sp=a7a37445-4335-41e3-a04c-d3330d678486.1746949171346&xid=36b51639-15ff-4914-bdc7-e21101fb27be&scope=openid%20offline_access&state=%7B%22redirectURL%22%3A%22%2F%3F_sp%3Da7a37445-4335-41e3-a04c-d3330d678486.1746949171346%22%7D&prompt=select_account%20consent&source=VERSO_NAVIGATION&client_id=condenast.identity.1d626eb68f1c4350244000c9fc888e38&redirect_uri=https%3A%2F%2Fwww.wired.com%2Fauth%2Fcomplete&response_type=code",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 92964,
+      "num_elements": 92,
+      "num_links": 6,
+      "num_images": 2,
+      "num_scripts": 15,
+      "num_styles": 15,
+      "num_iframes": 1,
+      "complexity_score": 1.3177249429025502
+    }
+  },
+  {
+    "url": "https://gizmodo.com/wp/wp-login.php",
+    "score": 0,
+    "reasons": [],
+    "metrics": {
+      "content_length": 34148,
+      "num_elements": 102,
+      "num_links": 4,
+      "num_images": 0,
+      "num_scripts": 27,
+      "num_styles": 15,
+      "num_iframes": 0,
+      "complexity_score": 0.4028496100533611
+    }
+  },
+  {
+    "url": "https://my.asos.com/account/login?store=ROW&country=IL&lang=en-GB&keyStoreDataversion=4i7nlxk-44&platform=web&returnUrl=https%3A%2F%2Fmy.asos.com%2Fauth%2Fconnect%2Fauthorize%2Fcallback%3Fclient_id%3Dwww%26scope%3Dopenid%20profile%20offline_access%20sensitive%26redirect_uri%3Dhttps%253A%252F%252Fwww.asos.com%252F%26client-request-id%3D0196be4d-77ba-7cca-b88c-37d504dfc5fb%26response_mode%3Dfragment%26response_type%3Dcode%26x-client-SKU%3Dmsal.js.browser%26x-client-VER%3D3.17.0%26client_info%3D1%26code_challenge%3DQBTQOvH0sUMkt7WP2_a7FrA0hr4O6JrZU3FH64pGNlQ%26code_challenge_method%3DS256%26nonce%3D0196be4d-77bb-7458-ad02-587185fa60c7%26state%3DeyJpZCI6IjAxOTZiZTRkLTc3YmItN2IwZC04MDhlLWY5M2UyYTJhZjZiOSIsIm1ldGEiOnsiaW50ZXJhY3Rpb25UeXBlIjoicmVkaXJlY3QifX0%253D%26store%3DROW%26keyStoreDataversion%3D4i7nlxk-44%26lang%3Den-GB%26country%3DIL%26suppressed_prompt",
+    "score": 1,
+    "reasons": [
+      "Error analyzing page: HTTPSConnectionPool(host='my.asos.com', port=443): Read timed out. (read timeout=30)"
+    ],
+    "metrics": {}
+  }
+]

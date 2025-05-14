@@ -1,0 +1,77 @@
+{
+  "statistics": {
+    "content_length": {
+      "mean": 493791.0813953488,
+      "median": 244950.5,
+      "std": 646857.0723994091,
+      "min": 915,
+      "max": 3286736,
+      "25th_percentile": 120702.25,
+      "75th_percentile": 590870.75
+    },
+    "num_elements": {
+      "mean": 1124.0813953488373,
+      "median": 809.0,
+      "std": 1104.7724728767753,
+      "min": 1,
+      "max": 4774,
+      "25th_percentile": 215.0,
+      "75th_percentile": 1808.5
+    },
+    "num_links": {
+      "mean": 155.1046511627907,
+      "median": 115.0,
+      "std": 164.81819067721915,
+      "min": 0,
+      "max": 868,
+      "25th_percentile": 18.25,
+      "75th_percentile": 237.0
+    },
+    "num_images": {
+      "mean": 36.44186046511628,
+      "median": 13.0,
+      "std": 49.907350549301746,
+      "min": 0,
+      "max": 202,
+      "25th_percentile": 1.0,
+      "75th_percentile": 49.5
+    },
+    "num_scripts": {
+      "mean": 31.953488372093023,
+      "median": 21.5,
+      "std": 34.393538030803604,
+      "min": 1,
+      "max": 202,
+      "25th_percentile": 12.25,
+      "75th_percentile": 37.75
+    },
+    "num_styles": {
+      "mean": 35.75581395348837,
+      "median": 27.0,
+      "std": 30.793787015264137,
+      "min": 0,
+      "max": 145,
+      "25th_percentile": 13.25,
+      "75th_percentile": 50.75
+    },
+    "num_iframes": {
+      "mean": 0.4418604651162791,
+      "median": 0.0,
+      "std": 0.8892118276421005,
+      "min": 0,
+      "max": 5,
+      "25th_percentile": 0.0,
+      "75th_percentile": 1.0
+    }
+  },
+  "suggested_normalization": {
+    "elements": 809,
+    "links": 237,
+    "images": 49,
+    "scripts": 37,
+    "styles": 50,
+    "iframes_weight": 5,
+    "min_content_length": 120702
+  },
+  "sample_size": 86
+}
