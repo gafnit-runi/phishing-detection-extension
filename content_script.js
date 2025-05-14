@@ -544,7 +544,7 @@ async function checkForPhishing() {
   const riskScore = urlAnalysis.score + contentAnalysis.score + dynamicAnalysis.score;
 
   // Combine all reasons
-  const allReasons = [...urlAnalysis.reasons, ...contentAnalysis.reasons, ...dynamicAnalysis.reasons, ...modelResult.reasons];
+  const allReasons = [...urlAnalysis.reasons, ...contentAnalysis.reasons, ...dynamicAnalysis.reasons, ...modelReasons];
   // Expose to window (for Selenium or testing)
   window.riskScore = riskScore;
   window.modelScore = modelResult.prediction;
@@ -593,3 +593,4 @@ window.addEventListener('load', () => {
     console.log('Page fully loaded, starting phishing check');
     await checkForPhishing();
   }, 3000);
+});
