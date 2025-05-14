@@ -561,3 +561,4 @@ window.addEventListener('load', () => {
     console.log('Page fully loaded, starting phishing check');
     checkForPhishing();
   }, 3000);
+});

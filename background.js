@@ -1,8 +1,6 @@
 // Background script for the extension
 import { extractFullFeatures } from './feature_extraction.js';
 
-let scaler = null;
-
 chrome.runtime.onInstalled.addListener(() => {
   console.log('Phishing Detection Extension installed');
 });

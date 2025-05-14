@@ -1,6 +1,8 @@
 import json
 from typing import Dict, List, Union, Any
 
+
+
 def count_nodes_and_leaves(tree: Dict[str, Any]) -> tuple[int, int]:
     """Count total nodes and leaf nodes in a tree."""
     if tree.get('leaf'):
@@ -30,20 +32,22 @@ def get_leaf_values(tree: Dict[str, Any]) -> set:
     collect_leaf_values(tree)
     return leaf_values
 
-def pretty_print_tree(tree: Dict[str, Any], indent: str = "", is_last: bool = True, is_left: bool = True) -> None:
+def pretty_print_tree(tree: Dict[str, Any],feature_names=[], indent: str = "", is_last: bool = True, is_left: bool = True) -> None:
     """Pretty print a tree structure."""
     if tree.get('leaf'):
         print(f"{indent}└── {'L' if is_left else 'R'} Leaf: {tree['value']}")
         return
-
-    print(f"{indent}└── {'L' if is_left else 'R'} Node: feature={tree.get('feature')}, threshold={tree.get('threshold')}")
+    feature_index = tree.get('feature')
+    feature_name = feature_names[feature_index] if feature_names and feature_index is not None else f"f{feature_index}"
+    print(f"{indent}└── {'L' if is_left else 'R'} Node: feature={feature_name}, threshold={tree.get('threshold')}")
+    
     
     if tree.get('left'):
-        pretty_print_tree(tree['left'], indent + "    ", False, True)
+        pretty_print_tree(tree['left'], feature_names, indent + "    ", False, True)
     if tree.get('right'):
-        pretty_print_tree(tree['right'], indent + "    ", True, False)
+        pretty_print_tree(tree['right'], feature_names, indent + "    ", True, False)
 
-def follow_path(tree: Dict[str, Any], path: str = "L→R→L→L→L→R→L→R") -> None:
+def follow_path(tree: Dict[str, Any], feature_names=[], path: str = "L→R→L→L→L→R→L→R") -> None:
     """Follow a specific path through the tree and print node values."""
     current = tree
     path_steps = path.split('→')[:-1]  # Remove last empty string
@@ -59,7 +63,9 @@ def follow_path(tree: Dict[str, Any], path: str = "L→R→L→L→L→R→L→R
             return
             
         print(f"Node value: {current.get('value', 'N/A')}")
-        print(f"Feature: {current.get('feature', 'N/A')}")
+        feature_index = current.get('feature')
+        feature_name = feature_names[feature_index] if feature_names and feature_index is not None else f"f{feature_index}"
+        print(f"Feature: {feature_name}")
         print(f"Threshold: {current.get('threshold', 'N/A')}")
         
         if step == 'L':
@@ -77,14 +83,14 @@ def follow_path(tree: Dict[str, Any], path: str = "L→R→L→L→L→R→L→R
     else:
         print("\nPath completed. Subtree from this point:")
         print("=" * 50)
-        pretty_print_tree(current, is_left=True)  # Root is considered left for consistency
+        pretty_print_tree(current,feature_names, is_left=True)  # Root is considered left for consistency
 
 def analyze_forest():
     """Load and analyze the random forest from the JSON file."""
     try:
-        with open('phishing_detector.json', 'r') as f:
+        with open('random_forest_model_reduced.json', 'r') as f:
             forest_data = json.load(f)
-        
+        feature_names = forest_data.get("feature_names", [])
         trees = forest_data.get('trees', [])
         print(f"\nAnalyzing Random Forest with {len(trees)} trees\n")
         print("=" * 80)
@@ -94,13 +100,15 @@ def analyze_forest():
             first_tree = trees[0]
             total_nodes, total_leaves = count_nodes_and_leaves(first_tree)
             
-            print("\nDetailed analysis of first tree:")
+            print("\n Detailed analysis of first tree:")
             print(f"Total nodes: {total_nodes}")
             print(f"Total leaves: {total_leaves}")
             
             # Follow specific path through first tree
-            follow_path(first_tree)
-            print("\n" + "=" * 80)
+            follow_path(first_tree, feature_names)
+            print("\n Subtree Preview:")
+            pretty_print_tree(first_tree, feature_names)
+
 
     except FileNotFoundError:
         print("Error: phishing_detector.json not found")
