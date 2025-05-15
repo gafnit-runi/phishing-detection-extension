@@ -109,34 +109,15 @@ function detectByStaticURL(url, domain) {
   const reasons = [];
   let score = 0;
 
-  const fakeBrands = ['paypal', 'google', 'apple', 'bank'];
-
-
-  fakeBrands.forEach(brand => {
-    if (domain.includes(brand) && !domain.endsWith(`${brand}.com`)) {
-      score += 1;
-      reasons.push(`Suspicious use of brand name: "${brand}" in ${domain}`);
-    }
-  });
-
   // Entropy-based scoring
   const entropy = calculateEntropy(url);
   if (entropy > 4.5) {
     score += 1;
-    reasons.push(`High entropy: ${entropy.toFixed(2)}`);
+    reasons.push('High entropy: ${entropy.toFixed(2)}');
   } else if (entropy > 4.0) {
     score += 0.5;
-    reasons.push(`Moderate entropy: ${entropy.toFixed(2)}`);
+    reasons.push('Moderate entropy: ${entropy.toFixed(2)}');
   }
-
-  // Suspicious keyword matches
-  const suspiciousKeywords = ['login', 'verify', 'account', 'signin', 'update', 'confirm'];
-  suspiciousKeywords.forEach(word => {
-    if (urlLower.includes(word)) {
-      score += 0.5;
-      reasons.push(`Suspicious keyword found in URL: "${word}"`);
-    }
-  });
 
   // Long URL
   if (url.length > 100) {
@@ -147,21 +128,18 @@ function detectByStaticURL(url, domain) {
   // IP address usage
   if (/^\d{1,3}(\.\d{1,3}){3}/.test(domain)) {
     score += 1;
-    reasons.push(`Domain is an IP address: ${domain}`);
+    reasons.push('Domain is an IP address: ${domain}');
   }
 
   // Obfuscated brand pattern detection
   if (/(paypa1|g00gle|secure-\w+)/.test(domain)) {
     score += 1;
-    reasons.push(`Obfuscated brand pattern in domain: ${domain}`);
+    reasons.push('Obfuscated brand pattern in domain: ${domain}');
   }
-
-  // Return binary result (1 if any risk found)
-  const isSuspicious = score >= 1;
 
   console.log("Detect By Static URL", { score, reasons });
   return {
-    score: isSuspicious ,  // update to retuern max score for now
+    score: score ,  // update to retuern max score for now
     reasons
   }
 }
@@ -480,16 +458,7 @@ function detectByStaticContent() {
   return {
     score: score,
     reasons,
-    contentMetrics: {
-      contentLength,
-      numElements,
-      numLinks,
-      numImages,
-      numScripts,
-      numStyles,
-      numIframes,
-      complexityScore
-    }
+    complexityScore
   };
 }
 
@@ -527,6 +496,50 @@ async function checkForPhishing() {
   // Combine all reasons
   const allReasons = [...urlReasons, ...contentReasons, ...dynamicReasons, ...modelReasons];
 
+  // Check URL for credential-related keywords
+  const credentialKeywords = [
+    // Login related
+    'login', 'log-in', 'log_in', 'signin', 'sign-in', 'sign_in', 'signup', 'sign-up', 'sign_up',
+    'register', 'registration', 'signup', 'sign-up', 'sign_up', 'join', 'create-account',
+    
+    // Account related
+    'account', 'profile', 'user', 'member', 'membership', 'my-account', 'myaccount',
+    
+    // Password related
+    'password', 'passwd', 'pwd', 'reset-password', 'resetpassword', 'forgot-password',
+    'forgotpassword', 'change-password', 'changepassword', 'recover', 'recovery',
+    
+    // Authentication related
+    'auth', 'authenticate', 'authentication', 'verify', 'verification', 'confirm',
+    'confirmation', 'validate', 'validation', 'security', 'secure',
+    
+    // Payment related
+    'payment', 'pay', 'checkout', 'billing', 'invoice', 'order', 'purchase',
+    'subscribe', 'subscription', 'upgrade', 'premium',
+    
+    // Banking related
+    'bank', 'banking', 'transfer', 'transaction', 'deposit', 'withdraw',
+    'balance', 'statement', 'card', 'credit', 'debit',
+    
+    // Identity related
+    'identity', 'id', 'verify-identity', 'identity-verification', 'kyc',
+    'personal-info', 'personal-information'
+  ];
+  const urlLower = url.toLowerCase();
+  const hasCredentialKeyword = credentialKeywords.some(keyword => urlLower.includes(keyword));
+  
+  // Check for credential input fields
+  const hasUsernameField = document.querySelector('input[type="text"][name*="user"], input[type="email"][name*="user"], input[type="text"][name*="login"], input[type="email"][name*="login"]');
+  const hasPasswordField = document.querySelector('input[type="password"]');
+  
+  const isCredsPage = hasCredentialKeyword || hasUsernameField || hasPasswordField;
+
+  // const isPhishing = (isCredsPage && (urlScore > 0 || contentScore > 0 || dynamicScore > 0 || modelScore > 0)) 
+  //                   || (urlScore > 1 && contentScore > 1)
+  //                   || (urlScore > 1 && dynamicScore > 1)
+  //                   || (modelScore > 1 && contentScore > 1)
+  //                   || (modelScore > 1 && dynamicScore > 1);
+
 
   // Expose to window (for Selenium or testing)
   window.riskScore = riskScore;
@@ -541,7 +554,8 @@ async function checkForPhishing() {
       domain,
       riskScore,
       reasons: allReasons,
-      contentMetrics
+      contentMetrics,
+      isPhishing
     }
   });
 }

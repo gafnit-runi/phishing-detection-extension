@@ -1,4 +1,3 @@
-
 // Get the current active tab
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const currentTab = tabs[0];
@@ -107,6 +106,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       </div>
       <p><strong>Domain:</strong> <span class="domain">${request.data.domain}</span></p>
       <p><strong>Risk Score:</strong> <span class="risk-score">${request.data.riskScore}/10</span></p>
+      <p><strong>Phishing Status:</strong> <span class="phishing-status">${request.data.isPhishing ? '⚠️ Likely Phishing' : '✅ Appears Safe'}</span></p>
       <p class="timestamp">Last Checked: ${timestamp}</p>
     `;
   } else if (request.type === 'SUSPICIOUS_REDIRECT') {
