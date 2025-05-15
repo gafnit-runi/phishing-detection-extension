@@ -552,13 +552,22 @@ async function checkForPhishing() {
   window.riskReasons = allReasons;
   console.log('riskReasons:',riskReasons)
   // For testing: Save to localStorage
+
   localStorage.setItem('riskScore', riskScore);
   localStorage.setItem('modelScore', modelResult.prediction);
   localStorage.setItem('modelconfidence', modelResult.confidence);
+  localStorage.setItem('riskReasons', JSON.stringify(allReasons));
+  localStorage.setItem('urlAnalysis_score', urlAnalysis.score);
+  localStorage.setItem('contentAnalysis_score', contentAnalysis.score);
+  localStorage.setItem('dynamicAnalysis_score', dynamicAnalysis.score);
+
   console.log('localStorage.riskScore:',localStorage.riskScore)
   console.log('localStorage.modelScore:',localStorage.modelScore)
   console.log('localStorage.modelconfidence:',localStorage.modelconfidence)
-  localStorage.setItem('riskReasons', JSON.stringify(allReasons));
+  console.log('localStorage.urlAnalysis_score:',localStorage.urlAnalysis_score)
+  console.log('localStorage.contentAnalysis_score:',localStorage.contentAnalysis_score)
+  console.log('localStorage.dynamicAnalysis_score:',localStorage.dynamicAnalysis_score)
+  console.log('localStorage.riskReasons:',localStorage.riskReasons)
   // for memory usage testing
   if (window.performance && window.performance.memory) {
     console.log("📦 JS Heap Used (bytes):", window.performance.memory.usedJSHeapSize);
