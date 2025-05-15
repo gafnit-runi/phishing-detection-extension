@@ -41,7 +41,6 @@ async function loadModel() {
     const response = await fetch(chrome.runtime.getURL('random_forest_model_reduced.json'));
     model = await response.json();  
     console.log('Model loaded successfully');
-    console.log(model);
     return model;
   } catch (error) {
     console.error('Error loading model:', error);
@@ -80,7 +79,6 @@ function runTree(tree, features) {
 function runModel(model, features) {
   const classTotals = new Array(model.n_classes).fill(0);
   const ordered = model.feature_names.map(f => features[f]);
-  console.log("Ordered features:", ordered);
   for (const tree of model.trees) {
     const output = runTree(tree, ordered); 
     for (let i = 0; i < model.n_classes; i++) {
