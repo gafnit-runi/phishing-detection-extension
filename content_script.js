@@ -10,7 +10,6 @@ console.log('Phishing Detection Extension: Content script loaded');
  * @returns {number} entropy - The entropy score (higher means more random)
  */
 function calculateEntropy(str) {
-  console.log('calculateEntropy');
   const frequency = {};
   for (let char of str) {
     frequency[char] = (frequency[char] || 0) + 1;
@@ -96,53 +95,85 @@ function detectByDynamicBehavior() {
 
 // Static URL Analysis
 /*
-checks the website's URL and domain
-  1.  Fake or spoofed brand names in the domain (e.g., paypa1.com)
-	2.	High entropy 
-	3.	Suspicious keywords
-	4.	Unusual characteristics (long URLs) or numeric IP addresses
-	5.	Obfuscated brand names (g00gle)
+Enhanced Static URL Analysis with model + heuristic fusion
+(model, digits, symbols, hyphens, containsAt, isIP, usesHTTP, entropy, keywords)
 */
-function detectByStaticURL(url, domain) {
-  const urlLower = url.toLowerCase();
 
+function detectByStaticURL(url, domain, modelScore = null, modelConfidence = null) {
+  const urlLower = url.toLowerCase();
   const reasons = [];
   let score = 0;
 
-  // Entropy-based scoring
+  // === Feature extractors ===
+  const digitCount = (url.match(/\d/g) || []).length;
+  const symbolCount = (url.match(/[^a-zA-Z0-9]/g) || []).length;
+  const hyphenCount = (url.match(/-/g) || []).length;
+  const containsAt = url.includes("@");
+  const isIP = /^\d{1,3}(\.\d{1,3}){3}$/.test(domain);
+  const usesHTTP = window.location.protocol === 'http:';
   const entropy = calculateEntropy(url);
+
+  if (digitCount > 10) {
+    score += 0.2;
+    reasons.push("High number of digits in URL");
+  }
+  if (symbolCount > 15) {
+    score += 0.2;
+    reasons.push("High number of symbols in URL");
+  }
+  if (hyphenCount > 3) {
+    score += 0.2;
+    reasons.push("Multiple hyphens in URL");
+  }
+  if (containsAt) {
+    score += 0.3;
+    reasons.push("Contains '@' symbol");
+  }
+  if (isIP) {
+    score += 0.5;
+    reasons.push("Domain is an IP address");
+  }
+  if (usesHTTP) {
+    score += 0.2;
+    reasons.push("Page uses HTTP instead of HTTPS");
+  }
   if (entropy > 4.5) {
-    score += 1;
-    reasons.push('High entropy: ${entropy.toFixed(2)}');
-  } else if (entropy > 4.0) {
-    score += 0.5;
-    reasons.push('Moderate entropy: ${entropy.toFixed(2)}');
+    score += 0.4;
+    reasons.push(`High entropy (${entropy.toFixed(2)})`);
   }
 
-  // Long URL
-  if (url.length > 100) {
-    score += 0.5;
-    reasons.push("URL is very long (>100 characters)");
+  // === Keyword checks ===
+  const suspiciousKeywords = ["login", "signin", "account", "verify", "update"];
+  suspiciousKeywords.forEach(kw => {
+    if (urlLower.includes(kw)) {
+      score += 0.3;
+      reasons.push(`Suspicious keyword in URL: '${kw}'`);
+    }
+  });
+
+  // === Combine with model ===
+  let finalScore = score;
+
+  if (modelScore === 1 && modelConfidence >= 0.8) {
+    finalScore = 1;
+    reasons.push("Model predicted phishing with high confidence");
+  } else if (modelScore === 1 && modelConfidence >= 0.6 && score >= 0.5) {
+    finalScore = 1;
+    reasons.push("Model low confidence, but heuristics support phishing");
+  } else if (modelScore === 0 && modelConfidence >= 0.6) {
+    finalScore = 0;
+    reasons.push("Model predicted benign with high confidence — trusted");
+  } else {
+    finalScore = finalScore >= 1.0 ? 1 : 0;
   }
 
-  // IP address usage
-  if (/^\d{1,3}(\.\d{1,3}){3}/.test(domain)) {
-    score += 1;
-    reasons.push('Domain is an IP address: ${domain}');
-  }
-
-  // Obfuscated brand pattern detection
-  if (/(paypa1|g00gle|secure-\w+)/.test(domain)) {
-    score += 1;
-    reasons.push('Obfuscated brand pattern in domain: ${domain}');
-  }
-
-  console.log("Detect By Static URL", { score, reasons });
+  console.log("Detec By Static URL", { finalScore, score, modelScore, modelConfidence, reasons });
   return {
-    score: score ,  // update to retuern max score for now
+    score: finalScore,
     reasons
-  }
+  };
 }
+
 
 // Add this function before detectByStaticContent
 function isValidDomain(domain) {
@@ -306,21 +337,24 @@ function detectByStaticContent() {
     const text = link.textContent || "";
     const href = link.href || "";
     
-    // Skip if link does NOT contain elements with src attribute (like images)
-    if (!link.querySelector('[src]')) {
-      if (text.includes('.')) {
-        const domainFromText = extractDomainFromText(text.trim());
-        if (domainFromText) {
-          try {
-            const linkUrl = new URL(href);
-            if (!linkUrl.hostname.includes(domainFromText)) {
-              // Potential phishing link detected
-              LinkGuard_score += 1;
-              reasons.push(`Mismatched anchor text vs href: "${domainFromText}" → "${href}"`);
-            }
-          } catch (e) {
-            console.error('Error parsing URL:', e);
+    // Skip if link contains elements with src attribute (like images)
+    if (link.querySelector('[src]')) {
+      console.log("link contains src attribute")
+      return;
+    }
+    
+    if (text.includes('.')) {
+      const domainFromText = extractDomainFromText(text.trim());
+      if (domainFromText) {
+        try {
+          const linkUrl = new URL(href);
+          if (!linkUrl.hostname.includes(domainFromText)) {
+            // Potential phishing link detected
+            LinkGuard_score += 1;
+            reasons.push(`Mismatched anchor text vs href: "${domainFromText}" → "${href}"`);
           }
+        } catch (e) {
+          console.error('Error parsing URL:', e);
         }
       }
     }
@@ -468,33 +502,37 @@ async function checkForPhishing() {
   console.log('checkForPhishing');
   const url = window.location.href;
   const domain = window.location.hostname;
-  
-  const { score: urlScore, reasons: urlReasons } = detectByStaticURL(url, domain);
-  const { score: contentScore, reasons: contentReasons, contentMetrics } = detectByStaticContent();
-  const { score: dynamicScore, reasons: dynamicReasons } = await detectByDynamicBehavior();
 
-  // Ask background to run the model
-  const result = await new Promise((resolve) => {
+  // Get ML model prediction from background script
+  const modelResult = await new Promise((resolve) => {
     chrome.runtime.sendMessage({ action: "check_url", url }, (response) => {
-      console.log("Prediction:", response.prediction);
-      console.log("Confidence:", response.confidence);
       resolve(response);
     });
   });
 
-  // Give +1 if model predicts phishing
-  const modelScore = result === "phishing" ? 1 : 0;
-  const modelReasons = result === "phishing" ? ["ML model predicted phishing domain."] : [];
+
+  // Run all detection methods in parallel
+  const [
+    urlAnalysis,
+    contentAnalysis, 
+    dynamicAnalysis
+  ] = await Promise.all([
+    detectByStaticURL(url, domain, modelResult.prediction, modelResult.confidence),
+    detectByStaticContent(),
+    detectByDynamicBehavior()
+  ]);
+
+    // Run all detection methods in parallel
 
   // const result = await checkUrlWithModel(domain);
-  console.log('urlScore:',urlScore)
-  console.log('contentScore:',contentScore)
-  console.log('dynamicScore:',dynamicScore)
+  console.log('urlScore:',urlAnalysis.score)
+  console.log('contentScore:',contentAnalysis.score)
+  console.log('dynamicScore:',dynamicAnalysis.score)
+  // console.log('result:',result)
+  // Calculate final risk score and combine reasons
+  const modelReasons = modelResult.prediction === 1 ? ["ML model predicted phishing domain."] : [];
 
-  const riskScore = urlScore + contentScore + dynamicScore + modelScore;
-
-  // Combine all reasons
-  const allReasons = [...urlReasons, ...contentReasons, ...dynamicReasons, ...modelReasons];
+  const riskScore = urlAnalysis.score + contentAnalysis.score + dynamicAnalysis.score;
 
   // Check URL for credential-related keywords
   const credentialKeywords = [
@@ -541,20 +579,45 @@ async function checkForPhishing() {
   //                   || (modelScore > 1 && dynamicScore > 1);
 
 
+  // Combine all reasons
+  const allReasons = [...urlAnalysis.reasons, ...contentAnalysis.reasons, ...dynamicAnalysis.reasons, ...modelReasons];
   // Expose to window (for Selenium or testing)
   window.riskScore = riskScore;
+  window.modelScore = modelResult.prediction;
+  window.modelconfidence = modelResult.confidence;
   window.riskReasons = allReasons;
-  
-  console.log('riskScore:',riskScore)
+  console.log('riskReasons:',riskReasons)
+  // For testing: Save to localStorage
+
+  localStorage.setItem('riskScore', riskScore);
+  localStorage.setItem('modelScore', modelResult.prediction);
+  localStorage.setItem('modelconfidence', modelResult.confidence);
+  localStorage.setItem('riskReasons', JSON.stringify(allReasons));
+  localStorage.setItem('urlAnalysis_score', urlAnalysis.score);
+  localStorage.setItem('contentAnalysis_score', contentAnalysis.score);
+  localStorage.setItem('dynamicAnalysis_score', dynamicAnalysis.score);
+
+  console.log('localStorage.riskScore:',localStorage.riskScore)
+  console.log('localStorage.modelScore:',localStorage.modelScore)
+  console.log('localStorage.modelconfidence:',localStorage.modelconfidence)
+  console.log('localStorage.urlAnalysis_score:',localStorage.urlAnalysis_score)
+  console.log('localStorage.contentAnalysis_score:',localStorage.contentAnalysis_score)
+  console.log('localStorage.dynamicAnalysis_score:',localStorage.dynamicAnalysis_score)
+  console.log('localStorage.riskReasons:',localStorage.riskReasons)
+  // for memory usage testing
+  if (window.performance && window.performance.memory) {
+    console.log("📦 JS Heap Used (bytes):", window.performance.memory.usedJSHeapSize);
+  }
+  // For testing close ////////////////////////////////
+
   // Send results to background script
   chrome.runtime.sendMessage({
     type: 'SCAN_RESULT',
     data: {
       url,
       domain,
-      riskScore,
+      riskScore: riskScore,
       reasons: allReasons,
-      contentMetrics,
       isPhishing
     }
   });
@@ -571,8 +634,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // Wait for page to be fully loaded
 window.addEventListener('load', () => {
   // Wait for 3 seconds to catch late-loading content
-  setTimeout(() => {
+  setTimeout(async () => {
     console.log('Page fully loaded, starting phishing check');
-    checkForPhishing();
+    await checkForPhishing();
   }, 3000);
 });

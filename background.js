@@ -117,7 +117,7 @@ function detectPhishing(url) {
   console.log("Standardized features:", standardized);
   const { predicted_class, confidence } = runModel(model, standardized);// Returns 0 or 1
   console.log("Predicted class:", predicted_class," Confidence:", confidence);
-  return { prediction: predicted_class === 1 ? "phishing" : "benign", confidence };
+  return { prediction: predicted_class, confidence };
 }
 
 // Handle messages from content script
