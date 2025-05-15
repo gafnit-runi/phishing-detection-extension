@@ -315,7 +315,7 @@ function detectByStaticContent() {
 
   if (complexityScore > 10) {
     reasons.push("Complex page detected");
-    score += 1;
+    score += 0.5;
   }
 
   // Link mismatch detection (LinkGuard-style)
@@ -350,7 +350,7 @@ function detectByStaticContent() {
           const linkUrl = new URL(href);
           if (!linkUrl.hostname.includes(domainFromText)) {
             // Potential phishing link detected
-            LinkGuard_score += 1;
+            LinkGuard_score += 0.1;
             reasons.push(`Mismatched anchor text vs href: "${domainFromText}" → "${href}"`);
           }
         } catch (e) {
@@ -360,14 +360,14 @@ function detectByStaticContent() {
     }
 
     if (/^\d{1,3}(\.\d{1,3}){3}/.test(href)) {
-      LinkGuard_score += 1;
+      LinkGuard_score += 0.2;
       reasons.push(`Link to raw IP address: ${href}`);
     }
   });
 
   if (LinkGuard_score > 0) {
     reasons.push("LinkGuard score:", LinkGuard_score);
-    score += 1;
+    score += LinkGuard_score;
   }
 
   // Form detection for phishing
@@ -392,7 +392,7 @@ function detectByStaticContent() {
     
     // Check for insecure form submission
     if (action.startsWith("http://")) {
-      formScore += 1;
+      formScore += 0.1;
       reasons.push(`Form submits to insecure (HTTP) action: ${action}`);
     }
     
@@ -400,13 +400,13 @@ function detectByStaticContent() {
       try {
         const actionUrl = new URL(action, window.location.href);
         if (actionUrl.hostname !== currentDomain) {
-          formScore += 1;
+          formScore += 0.1;
           reasons.push(`Login form submits to different domain: ${actionUrl.hostname}`);
         }
       } catch (e) {
         // If action is not a valid URL, check if it's a relative path
         if (!action.startsWith('/') && !action.startsWith('./')) {
-          formScore += 1;
+          formScore += 0.1;
           reasons.push(`Suspicious form action: ${action}`);
         }
       }
@@ -428,7 +428,7 @@ function detectByStaticContent() {
   });
 
   if (suspiciousSubmitHandlers.length > 0) {
-    formScore += 1;
+    formScore += 0.1;
     reasons.push(`Found ${suspiciousSubmitHandlers.length} suspicious form submission handlers`);
   }
 
@@ -474,18 +474,11 @@ function detectByStaticContent() {
   };
 
   if (suspiciousSubmissions) {
-    formScore += 1;
+    formScore += 0.1;
   }
 
   if (formScore > 0) {
-    score += 1;
-  }
-
-  // Sensitive input field detection
-  const sensitiveInputs = document.querySelectorAll("input[type='password'], input[name*='card'], input[name*='ssn']");
-  if (sensitiveInputs.length >= 2) {
-    reasons.push("Multiple sensitive input fields detected (password, card, SSN)");
-    score += 1;
+    score += formScore;
   }
 
   console.log("Detect By Static Content", { score, reasons });
@@ -532,6 +525,9 @@ async function checkForPhishing() {
   // Calculate final risk score and combine reasons
   const modelReasons = modelResult.prediction === 1 ? ["ML model predicted phishing domain."] : [];
 
+  const modelScore = modelResult.prediction
+  const modelConfidence = modelResult.confidence
+
   const riskScore = urlAnalysis.score + contentAnalysis.score + dynamicAnalysis.score;
 
   // Check URL for credential-related keywords
@@ -572,12 +568,16 @@ async function checkForPhishing() {
   
   const isCredsPage = hasCredentialKeyword || hasUsernameField || hasPasswordField;
 
-  // const isPhishing = (isCredsPage && (urlScore > 0 || contentScore > 0 || dynamicScore > 0 || modelScore > 0)) 
-  //                   || (urlScore > 1 && contentScore > 1)
-  //                   || (urlScore > 1 && dynamicScore > 1)
-  //                   || (modelScore > 1 && contentScore > 1)
-  //                   || (modelScore > 1 && dynamicScore > 1);
-
+  const isPhishing = (isCredsPage && modelScore == 1 && modelConfidence > 0.6)
+                  || (isCredsPage && modelScore == 1 && urlAnalysis.score > 0.1 && contentAnalysis.score > 0.1)
+                  || (isCredsPage && modelScore == 1 && urlAnalysis.score > 0.3)
+                  || (isCredsPage && modelScore == 1 && contentAnalysis.score > 0.3)
+                  || (isCredsPage && modelConfidence > 0.6 && urlAnalysis.score > 0.5 && contentAnalysis.score > 0.5)
+                  || (isCredsPage && urlAnalysis.score > 0.3 && contentAnalysis.score > 0.3)
+                  || (modelScore == 1 && modelConfidence > 0.6 && urlAnalysis.score > 0.3)
+                  || (modelScore == 1 && modelConfidence > 0.6 && contentAnalysis.score > 0.3)
+                  || (modelScore == 1 && urlAnalysis.score > 0.3 && contentAnalysis.score > 0.3)
+                  || (urlAnalysis.score > 0.8 && contentAnalysis.score > 0.8);
 
   // Combine all reasons
   const allReasons = [...urlAnalysis.reasons, ...contentAnalysis.reasons, ...dynamicAnalysis.reasons, ...modelReasons];
