@@ -38,62 +38,72 @@ function detectByDynamicBehavior() {
   return new Promise((resolve) => {
     let score = 0;
     const reasons = [];
+    let resolved = false;
 
-    // Detect redirect using Navigation Timing API
-    const navEntry = performance.getEntriesByType("navigation")[0];
-    const currentUrl = window.location.href;
-    if (navEntry && navEntry.type === "reload" && navEntry.redirectCount > 0) {
-      if (navEntry?.name) {
-        try {
-          const originalUrl = new URL(navEntry.name);
-          const currentParsed = new URL(currentUrl);
-          const samePath = originalUrl.origin + originalUrl.pathname === currentParsed.origin + currentParsed.pathname;
-          const sameQuery = originalUrl.search === currentParsed.search;
-          if (!samePath || !sameQuery) {
-            score += 1;
-            reasons.push(`Redirect detected: ${originalUrl.href} → ${currentParsed.href}`);
-          }
-        } catch (err) {
-          reasons.push("Redirect detection failed (malformed URL).");
-          reasons.push("Suspicious redirect detected after page load.");
+    // Redirect Detection 
+    try {
+      const navEntry = performance.getEntriesByType("navigation")[0];
+      const currentUrl = window.location.href;
+
+      if (navEntry?.type === "reload" && navEntry.redirectCount > 0) {
+        const originalUrl = new URL(navEntry.name);
+        const currentParsed = new URL(currentUrl);
+
+        const samePath = originalUrl.origin + originalUrl.pathname === currentParsed.origin + currentParsed.pathname;
+        const sameQuery = originalUrl.search === currentParsed.search;
+
+        if (!samePath || !sameQuery) {
+          score += 0.5;
+          reasons.push(`Redirect detected`);
         }
       }
-    } 
+    } catch (err) {
+      reasons.push("Redirect detection failed or malformed URL.");
+    }
 
-    // Monitor for dynamic script or iframe injections
+    // Mutation Observer Setup
     const observer = new MutationObserver(mutations => {
-      mutations.forEach(mutation => {
-        mutation.addedNodes.forEach(node => {
+      for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
           if (node.tagName === "SCRIPT" || node.tagName === "IFRAME") {
-            score += 1;
+            score += 0.5;
             reasons.push(`Dynamically injected <${node.tagName.toLowerCase()}> detected.`);
+
+            // Optional: early resolve on first serious event
+            if (!resolved) {
+              resolved = true;
+              observer.disconnect();
+              resolve({ score, reasons });
+              return;
+            }
           }
-        });
-      });
+        }
+      }
     });
 
-    // Delay observation start to avoid false positives
+    // Only start after short delay
     setTimeout(() => {
       const body = document.body;
-      if (body) {
-        observer.observe(body, {
-          childList: true,
-          subtree: true
-        });
 
-        // Stop observing after 5s and resolve the result
-        setTimeout(() => {
-          observer.disconnect();
-          console.log("Dynamic Behavior Check Done", { score, reasons });
-          resolve({
-            score: score, // update to retuern max score for now
-            reasons
-          });
-        }, 5000);
-      } else {
+      if (!body) {
         resolve({ score: 0, reasons: ["Document body not available"] });
+        return;
       }
-    }, 2000);
+
+      observer.observe(body, {
+        childList: true,
+        subtree: true
+      });
+
+      // observer will end after 5s if not resolved yet
+      setTimeout(() => {
+        if (!resolved) {
+          observer.disconnect();
+          resolved = true;
+          resolve({ score, reasons });
+        }
+      }, 5000);
+    }, 1000); // Slightly shorter delay to reduce total time
   });
 }
 
@@ -145,11 +155,11 @@ function detectByStaticURL(url, domain, modelScore = null, modelConfidence = nul
     reasons.push("Page uses HTTP instead of HTTPS");
   }
   if (entropy > 4.2) {
-    score += 0.4;
+    score += 0.5;
     reasons.push(`High entropy`);
   }
   if (isSuspiciousHost(domain)) {
-    score += 0.3;
+    score += 0.5;
     reasons.push("Hosted on suspicious or free hosting platform");
   }
 
@@ -318,7 +328,7 @@ function detectByStaticContent() {
 
   if (complexityScore > 10) {
     reasons.push("Complex page detected");
-    score += 0.5;
+    score += 0.3;
   }
 
   // Link mismatch detection (LinkGuard-style)
@@ -354,7 +364,7 @@ function detectByStaticContent() {
           if (!linkUrl.hostname.includes(domainFromText)) {
             // Potential phishing link detected
             LinkGuard_score += 0.1;
-            reasons.push(`Mismatched anchor text vs href: "${domainFromText}" → "${href}"`);
+            reasons.push(`Mismatched anchor text vs href`);
           }
         } catch (e) {
           console.error('Error parsing URL:', e);
@@ -364,12 +374,12 @@ function detectByStaticContent() {
 
     if (/^\d{1,3}(\.\d{1,3}){3}/.test(href)) {
       LinkGuard_score += 0.2;
-      reasons.push(`Link to raw IP address: ${href}`);
+      reasons.push(`Link to raw IP address`);
     }
   });
 
   if (LinkGuard_score > 0) {
-    reasons.push("LinkGuard score:", LinkGuard_score);
+    reasons.push("LinkGuard score");
     score += LinkGuard_score;
   }
 
@@ -396,7 +406,7 @@ function detectByStaticContent() {
     // Check for insecure form submission
     if (action.startsWith("http://")) {
       formScore += 0.1;
-      reasons.push(`Form submits to insecure (HTTP) action: ${action}`);
+      reasons.push(`Form submits to insecure (HTTP) action`);
     }
     
     if (hasPasswordField) {
@@ -404,13 +414,13 @@ function detectByStaticContent() {
         const actionUrl = new URL(action, window.location.href);
         if (actionUrl.hostname !== currentDomain) {
           formScore += 0.1;
-          reasons.push(`Login form submits to different domain: ${actionUrl.hostname}`);
+          reasons.push(`Login form submits to different domain`);
         }
       } catch (e) {
         // If action is not a valid URL, check if it's a relative path
         if (!action.startsWith('/') && !action.startsWith('./')) {
           formScore += 0.1;
-          reasons.push(`Suspicious form action: ${action}`);
+          reasons.push(`Suspicious form action`);
         }
       }
     }
@@ -432,7 +442,7 @@ function detectByStaticContent() {
 
   if (suspiciousSubmitHandlers.length > 0) {
     formScore += 0.1;
-    reasons.push(`Found ${suspiciousSubmitHandlers.length} suspicious form submission handlers`);
+    reasons.push(`Found suspicious form submission handlers`);
   }
 
   // Check for fetch/XHR event listeners
@@ -447,11 +457,11 @@ function detectByStaticContent() {
         const submissionUrl = new URL(url, window.location.href);
         if (submissionUrl.hostname !== currentDomain) {
           suspiciousSubmissions = true;
-          reasons.push(`Suspicious fetch submission to: ${submissionUrl.hostname}`);
+          reasons.push(`Suspicious fetch submission to`);
         }
       } catch (e) {
         suspiciousSubmissions = true;
-        reasons.push(`Suspicious fetch submission to invalid URL: ${url}`);
+        reasons.push(`Suspicious fetch submission to invalid URL`);
       }
     }
     return originalFetch.apply(this, args);
@@ -465,11 +475,11 @@ function detectByStaticContent() {
           const submissionUrl = new URL(url, window.location.href);
           if (submissionUrl.hostname !== currentDomain) {
             suspiciousSubmissions = true;
-            reasons.push(`Suspicious XHR submission to: ${submissionUrl.hostname}`);
+            reasons.push(`Suspicious XHR submission to`);
           }
         } catch (e) {
           suspiciousSubmissions = true;
-          reasons.push(`Suspicious XHR submission to invalid URL: ${url}`);
+          reasons.push(`Suspicious XHR submission to invalid URL`);
         }
       }
     }
@@ -589,6 +599,7 @@ async function checkForPhishing() {
   window.modelScore = modelResult.prediction;
   window.modelconfidence = modelResult.confidence;
   window.riskReasons = allReasons;
+  window.isCredsPage = isCredsPage;
   console.log('riskReasons:',riskReasons)
   // For testing: Save to localStorage
 
@@ -599,7 +610,7 @@ async function checkForPhishing() {
   localStorage.setItem('urlAnalysis_score', urlAnalysis.score);
   localStorage.setItem('contentAnalysis_score', contentAnalysis.score);
   localStorage.setItem('dynamicAnalysis_score', dynamicAnalysis.score);
-
+  localStorage.setItem('isCredsPage', Number(isCredsPage));
   console.log('localStorage.isPhishing:',Number(localStorage.isPhishing))
   console.log('localStorage.modelScore:',localStorage.modelScore)
   console.log('localStorage.modelconfidence:',localStorage.modelconfidence)
