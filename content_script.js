@@ -2,8 +2,8 @@
 console.log('Phishing Detection Extension: Content script loaded');
 
 const SUSPICIOUS_HOSTING = new Set([
-  "webflow.io", "wixsite.com", "squarespace.com", "notion.site", "github.io",
-  "netlify.app", "vercel.app", "glitch.me", "000webhostapp.com"
+  'godaddysites.com', 'weebly.com', 'webflow.io', 'wixsite.com', 'squarespace.com', 'notion.site', 'github.io',
+  'netlify.app', 'vercel.app', 'glitch.me', '000webhostapp.com'
 ]);
 
 // === Entropy Calculator ===
@@ -26,85 +26,6 @@ function calculateEntropy(str) {
     entropy -= p * Math.log2(p);
   }
   return entropy;
-}
-
-/**
- * Detects suspicious dynamic behavior on the page,
- * 1. redirects after the initial load.
- * 2.Dynamically added <script> or <iframe> elements (common in phishing attacks)
- */
-
-function detectByDynamicBehavior() {
-  return new Promise((resolve) => {
-    let score = 0;
-    const reasons = [];
-    let resolved = false;
-
-    // Redirect Detection 
-    try {
-      const navEntry = performance.getEntriesByType("navigation")[0];
-      const currentUrl = window.location.href;
-
-      if (navEntry?.type === "reload" && navEntry.redirectCount > 0) {
-        const originalUrl = new URL(navEntry.name);
-        const currentParsed = new URL(currentUrl);
-
-        const samePath = originalUrl.origin + originalUrl.pathname === currentParsed.origin + currentParsed.pathname;
-        const sameQuery = originalUrl.search === currentParsed.search;
-
-        if (!samePath || !sameQuery) {
-          score += 0.5;
-          reasons.push(`Redirect detected`);
-        }
-      }
-    } catch (err) {
-      reasons.push("Redirect detection failed or malformed URL.");
-    }
-
-    // Mutation Observer Setup
-    const observer = new MutationObserver(mutations => {
-      for (const mutation of mutations) {
-        for (const node of mutation.addedNodes) {
-          if (node.tagName === "SCRIPT" || node.tagName === "IFRAME") {
-            score += 0.5;
-            reasons.push(`Dynamically injected <${node.tagName.toLowerCase()}> detected.`);
-
-            // Optional: early resolve on first serious event
-            if (!resolved) {
-              resolved = true;
-              observer.disconnect();
-              resolve({ score, reasons });
-              return;
-            }
-          }
-        }
-      }
-    });
-
-    // Only start after short delay
-    setTimeout(() => {
-      const body = document.body;
-
-      if (!body) {
-        resolve({ score: 0, reasons: ["Document body not available"] });
-        return;
-      }
-
-      observer.observe(body, {
-        childList: true,
-        subtree: true
-      });
-
-      // observer will end after 5s if not resolved yet
-      setTimeout(() => {
-        if (!resolved) {
-          observer.disconnect();
-          resolved = true;
-          resolve({ score, reasons });
-        }
-      }, 5000);
-    }, 1000); // Slightly shorter delay to reduce total time
-  });
 }
 
 
@@ -132,53 +53,52 @@ function detectByStaticURL(url, domain, modelScore = null, modelConfidence = nul
 
   if (digitCount > 5) {
     score += 0.1;
-    reasons.push("High number of digits in URL");
+    reasons.push('High number of digits in URL');
   }
   if (symbolCount > 10) {
     score += 0.1;
-    reasons.push("High number of symbols in URL");
+    reasons.push('High number of symbols in URL');
   }
   if (hyphenCount > 3) {
     score += 0.2;
-    reasons.push("Multiple hyphens in URL");
+    reasons.push('Multiple hyphens in URL');
   }
   if (containsAt) {
     score += 0.3;
-    reasons.push("Contains '@' symbol");
+    reasons.push('Contains @ symbol');
   }
   if (isIP) {
     score += 0.5;
-    reasons.push("Domain is an IP address");
+    reasons.push('Domain is an IP address');
   }
   if (usesHTTP) {
     score += 0.2;
-    reasons.push("Page uses HTTP instead of HTTPS");
+    reasons.push('Page uses HTTP instead of HTTPS');
   }
   if (entropy > 4.2) {
     score += 0.5;
-    reasons.push(`High entropy`);
+    reasons.push('High entropy');
   }
   if (isSuspiciousHost(domain)) {
-    score += 0.4;
-    reasons.push("Hosted on suspicious or free hosting platform");
+    score += 0.5;
+    reasons.push('Hosted on suspicious or free hosting platform');
   }
 
+  // Suspicious sequence patterns ===
+  if (/[0-9]{5,}/.test(url)) {
+    score += 0.3;
+    reasons.push('Suspicious numeric sequence in URL');
+  }
+  if (/[^a-zA-Z0-9]{3,}/.test(url)) {
+    score += 0.3;
+    reasons.push('Suspicious symbol sequence in URL');
+  }
+  if (/(.)\1{2,}/.test(url)) {
+    score += 0.3;
+    reasons.push('Repeated characters in URL');
+  }
 
-  // // === Combine with model ===
   let finalScore = score;
-
-  // if (modelScore === 1 && modelConfidence >= 0.8) {
-  //   finalScore = 1;
-  //   reasons.push("Model predicted phishing with high confidence");
-  // } else if (modelScore === 1 && modelConfidence >= 0.6 && score >= 0.5) {
-  //   finalScore = 1;
-  //   reasons.push("Model low confidence, but heuristics support phishing");
-  // } else if (modelScore === 0 && modelConfidence >= 0.6) {
-  //   finalScore = 0;
-  //   reasons.push("Model predicted benign with high confidence — trusted");
-  // } else {
-  //   finalScore = finalScore >= 1.0 ? 1 : 0;
-  // }
 
   console.log("Detec By Static URL", { finalScore, score, modelScore, modelConfidence, reasons });
   return {
@@ -326,8 +246,8 @@ function detectByStaticContent() {
   if (pageStats.content_length < 5000) complexityScore += 3;
   if (pageStats.num_scripts === 0 && pageStats.num_styles === 0) complexityScore += 4;
 
-  if (complexityScore > 10) {
-    reasons.push("Complex page detected");
+  if (complexityScore > 20) {
+    reasons.push('Complex page detected');
     score += 0.3;
   }
 
@@ -364,7 +284,7 @@ function detectByStaticContent() {
           if (!linkUrl.hostname.includes(domainFromText)) {
             // Potential phishing link detected
             LinkGuard_score += 0.1;
-            reasons.push(`Mismatched anchor text vs href`);
+            reasons.push('Mismatched anchor text vs href');
           }
         } catch (e) {
           console.error('Error parsing URL:', e);
@@ -374,12 +294,12 @@ function detectByStaticContent() {
 
     if (/^\d{1,3}(\.\d{1,3}){3}/.test(href)) {
       LinkGuard_score += 0.2;
-      reasons.push(`Link to raw IP address`);
+      reasons.push('Link to raw IP address');
     }
   });
 
   if (LinkGuard_score > 0) {
-    reasons.push("LinkGuard score");
+    reasons.push('LinkGuard score');
     score += LinkGuard_score;
   }
 
@@ -406,7 +326,7 @@ function detectByStaticContent() {
     // Check for insecure form submission
     if (action.startsWith("http://")) {
       formScore += 0.1;
-      reasons.push(`Form submits to insecure (HTTP) action`);
+      reasons.push('Form submits to insecure (HTTP) action');
     }
     
     if (hasPasswordField) {
@@ -414,13 +334,13 @@ function detectByStaticContent() {
         const actionUrl = new URL(action, window.location.href);
         if (actionUrl.hostname !== currentDomain) {
           formScore += 0.1;
-          reasons.push(`Login form submits to different domain`);
+          reasons.push('Login form submits to different domain');
         }
       } catch (e) {
         // If action is not a valid URL, check if it's a relative path
         if (!action.startsWith('/') && !action.startsWith('./')) {
           formScore += 0.1;
-          reasons.push(`Suspicious form action`);
+          reasons.push('Suspicious form action');
         }
       }
     }
@@ -442,7 +362,7 @@ function detectByStaticContent() {
 
   if (suspiciousSubmitHandlers.length > 0) {
     formScore += 0.1;
-    reasons.push(`Found suspicious form submission handlers`);
+    reasons.push('Found suspicious form submission handlers');
   }
 
   // Check for fetch/XHR event listeners
@@ -457,11 +377,11 @@ function detectByStaticContent() {
         const submissionUrl = new URL(url, window.location.href);
         if (submissionUrl.hostname !== currentDomain) {
           suspiciousSubmissions = true;
-          reasons.push(`Suspicious fetch submission to`);
+          reasons.push('Suspicious fetch submission to');
         }
       } catch (e) {
         suspiciousSubmissions = true;
-        reasons.push(`Suspicious fetch submission to invalid URL`);
+        reasons.push('Suspicious fetch submission to invalid URL');
       }
     }
     return originalFetch.apply(this, args);
@@ -475,11 +395,11 @@ function detectByStaticContent() {
           const submissionUrl = new URL(url, window.location.href);
           if (submissionUrl.hostname !== currentDomain) {
             suspiciousSubmissions = true;
-            reasons.push(`Suspicious XHR submission to`);
+            reasons.push('Suspicious XHR submission to');
           }
         } catch (e) {
           suspiciousSubmissions = true;
-          reasons.push(`Suspicious XHR submission to invalid URL`);
+          reasons.push('Suspicious XHR submission to invalid URL');
         }
       }
     }
@@ -521,11 +441,10 @@ async function checkForPhishing() {
   const [
     urlAnalysis,
     contentAnalysis, 
-    dynamicAnalysis
+
   ] = await Promise.all([
     detectByStaticURL(url, domain, modelResult.prediction, modelResult.confidence),
     detectByStaticContent(),
-    detectByDynamicBehavior()
   ]);
 
     // Run all detection methods in parallel
@@ -533,7 +452,7 @@ async function checkForPhishing() {
   // const result = await checkUrlWithModel(domain);
   console.log('urlScore:',urlAnalysis.score)
   console.log('contentScore:',contentAnalysis.score)
-  console.log('dynamicScore:',dynamicAnalysis.score)
+  
   // console.log('result:',result)
   // Calculate final risk score and combine reasons
   const modelReasons = modelResult.prediction === 1 ? ["ML model predicted phishing domain."] : [];
@@ -541,7 +460,6 @@ async function checkForPhishing() {
   const modelScore = modelResult.prediction
   const modelConfidence = modelResult.confidence
 
-  const riskScore = urlAnalysis.score + contentAnalysis.score + dynamicAnalysis.score;
 
   // Check URL for credential-related keywords
   const credentialKeywords = [
@@ -581,19 +499,20 @@ async function checkForPhishing() {
   
   const isCredsPage = hasCredentialKeyword || hasUsernameField || hasPasswordField;
   console.log('isCredsPage:',isCredsPage)
-  const isPhishing = (isCredsPage && modelScore == 1 && modelConfidence > 0.7)
+  const isPhishing = (isCredsPage && modelScore == 1 && modelConfidence > 0.6)
                   || (isCredsPage && modelScore == 1 && urlAnalysis.score > 0.1 && contentAnalysis.score > 0.1)
                   || (isCredsPage && modelScore == 1 && urlAnalysis.score > 0.3)
                   || (isCredsPage && modelScore == 1 && contentAnalysis.score > 0.3)
-                  || (isCredsPage && modelConfidence > 0.6 && urlAnalysis.score > 0.5 && contentAnalysis.score > 0.5)
-                  || (isCredsPage && urlAnalysis.score > 0.3 && contentAnalysis.score > 0.3)
-                  || (modelScore == 1 && modelConfidence > 0.6 && urlAnalysis.score > 0.3)
-                  || (modelScore == 1 && modelConfidence > 0.6 && contentAnalysis.score > 0.3)
+                  || (isCredsPage && modelConfidence < 0.9 && urlAnalysis.score > 0.3 && contentAnalysis.score > 0.3)
+                  || (isCredsPage && urlAnalysis.score > 0.4 )
+                  | (isCredsPage && contentAnalysis.score > 0.5)
+                  || (modelScore == 1 && modelConfidence > 0.6 && urlAnalysis.score > 0.2)
+                  || (modelScore == 1 && modelConfidence > 0.6 && contentAnalysis.score > 0.2)
                   || (modelScore == 1 && urlAnalysis.score > 0.3 && contentAnalysis.score > 0.3)
-                  || (urlAnalysis.score > 0.8 && contentAnalysis.score > 0.8);
+                  || (urlAnalysis.score > 0.4 || contentAnalysis.score > 0.5);
 
   // Combine all reasons
-  const allReasons = [...urlAnalysis.reasons, ...contentAnalysis.reasons, ...dynamicAnalysis.reasons, ...modelReasons];
+  const allReasons = [...urlAnalysis.reasons, ...contentAnalysis.reasons, ...modelReasons];
   // Expose to window (for Selenium or testing)
   window.isPhishing = isPhishing;
   window.modelScore = modelResult.prediction;
@@ -609,14 +528,14 @@ async function checkForPhishing() {
   localStorage.setItem('riskReasons', JSON.stringify(allReasons));
   localStorage.setItem('urlAnalysis_score', urlAnalysis.score);
   localStorage.setItem('contentAnalysis_score', contentAnalysis.score);
-  localStorage.setItem('dynamicAnalysis_score', dynamicAnalysis.score);
+
   localStorage.setItem('isCredsPage', Number(isCredsPage));
   console.log('localStorage.isPhishing:',Number(localStorage.isPhishing))
   console.log('localStorage.modelScore:',localStorage.modelScore)
   console.log('localStorage.modelconfidence:',localStorage.modelconfidence)
   console.log('localStorage.urlAnalysis_score:',localStorage.urlAnalysis_score)
   console.log('localStorage.contentAnalysis_score:',localStorage.contentAnalysis_score)
-  console.log('localStorage.dynamicAnalysis_score:',localStorage.dynamicAnalysis_score)
+  
   console.log('localStorage.riskReasons:',localStorage.riskReasons)
   // for memory usage testing
   if (window.performance && window.performance.memory) {
@@ -630,7 +549,6 @@ async function checkForPhishing() {
     data: {
       url,
       domain,
-      riskScore: riskScore,
       reasons: allReasons,
       isPhishing
     }
