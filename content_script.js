@@ -1,6 +1,11 @@
 // Content script that runs on every page
 console.log('Phishing Detection Extension: Content script loaded');
 
+const SUSPICIOUS_HOSTING = new Set([
+  "webflow.io", "wixsite.com", "squarespace.com", "notion.site", "github.io",
+  "netlify.app", "vercel.app", "glitch.me", "000webhostapp.com"
+]);
+
 // === Entropy Calculator ===
 /**
  * Calculates Shannon entropy - measures the randomness or complexity of a string.
@@ -98,12 +103,14 @@ function detectByDynamicBehavior() {
 Enhanced Static URL Analysis with model + heuristic fusion
 (model, digits, symbols, hyphens, containsAt, isIP, usesHTTP, entropy, keywords)
 */
+function isSuspiciousHost(domain) {
+  return Array.from(SUSPICIOUS_HOSTING).some(host => domain.endsWith(host));
+}
 
 function detectByStaticURL(url, domain, modelScore = null, modelConfidence = null) {
-  const urlLower = url.toLowerCase();
   const reasons = [];
   let score = 0;
-
+  console.log('domain:',domain)
   // === Feature extractors ===
   const digitCount = (url.match(/\d/g) || []).length;
   const symbolCount = (url.match(/[^a-zA-Z0-9]/g) || []).length;
@@ -113,12 +120,12 @@ function detectByStaticURL(url, domain, modelScore = null, modelConfidence = nul
   const usesHTTP = window.location.protocol === 'http:';
   const entropy = calculateEntropy(url);
 
-  if (digitCount > 10) {
-    score += 0.2;
+  if (digitCount > 5) {
+    score += 0.1;
     reasons.push("High number of digits in URL");
   }
-  if (symbolCount > 15) {
-    score += 0.2;
+  if (symbolCount > 10) {
+    score += 0.1;
     reasons.push("High number of symbols in URL");
   }
   if (hyphenCount > 3) {
@@ -137,35 +144,31 @@ function detectByStaticURL(url, domain, modelScore = null, modelConfidence = nul
     score += 0.2;
     reasons.push("Page uses HTTP instead of HTTPS");
   }
-  if (entropy > 4.5) {
+  if (entropy > 4.2) {
     score += 0.4;
-    reasons.push(`High entropy (${entropy.toFixed(2)})`);
+    reasons.push(`High entropy`);
+  }
+  if (isSuspiciousHost(domain)) {
+    score += 0.3;
+    reasons.push("Hosted on suspicious or free hosting platform");
   }
 
-  // === Keyword checks ===
-  const suspiciousKeywords = ["login", "signin", "account", "verify", "update"];
-  suspiciousKeywords.forEach(kw => {
-    if (urlLower.includes(kw)) {
-      score += 0.3;
-      reasons.push(`Suspicious keyword in URL: '${kw}'`);
-    }
-  });
 
-  // === Combine with model ===
+  // // === Combine with model ===
   let finalScore = score;
 
-  if (modelScore === 1 && modelConfidence >= 0.8) {
-    finalScore = 1;
-    reasons.push("Model predicted phishing with high confidence");
-  } else if (modelScore === 1 && modelConfidence >= 0.6 && score >= 0.5) {
-    finalScore = 1;
-    reasons.push("Model low confidence, but heuristics support phishing");
-  } else if (modelScore === 0 && modelConfidence >= 0.6) {
-    finalScore = 0;
-    reasons.push("Model predicted benign with high confidence — trusted");
-  } else {
-    finalScore = finalScore >= 1.0 ? 1 : 0;
-  }
+  // if (modelScore === 1 && modelConfidence >= 0.8) {
+  //   finalScore = 1;
+  //   reasons.push("Model predicted phishing with high confidence");
+  // } else if (modelScore === 1 && modelConfidence >= 0.6 && score >= 0.5) {
+  //   finalScore = 1;
+  //   reasons.push("Model low confidence, but heuristics support phishing");
+  // } else if (modelScore === 0 && modelConfidence >= 0.6) {
+  //   finalScore = 0;
+  //   reasons.push("Model predicted benign with high confidence — trusted");
+  // } else {
+  //   finalScore = finalScore >= 1.0 ? 1 : 0;
+  // }
 
   console.log("Detec By Static URL", { finalScore, score, modelScore, modelConfidence, reasons });
   return {
@@ -567,8 +570,8 @@ async function checkForPhishing() {
   const hasPasswordField = document.querySelector('input[type="password"]');
   
   const isCredsPage = hasCredentialKeyword || hasUsernameField || hasPasswordField;
-
-  const isPhishing = (isCredsPage && modelScore == 1 && modelConfidence > 0.6)
+  console.log('isCredsPage:',isCredsPage)
+  const isPhishing = (isCredsPage && modelScore == 1 && modelConfidence > 0.7)
                   || (isCredsPage && modelScore == 1 && urlAnalysis.score > 0.1 && contentAnalysis.score > 0.1)
                   || (isCredsPage && modelScore == 1 && urlAnalysis.score > 0.3)
                   || (isCredsPage && modelScore == 1 && contentAnalysis.score > 0.3)
@@ -582,14 +585,14 @@ async function checkForPhishing() {
   // Combine all reasons
   const allReasons = [...urlAnalysis.reasons, ...contentAnalysis.reasons, ...dynamicAnalysis.reasons, ...modelReasons];
   // Expose to window (for Selenium or testing)
-  window.riskScore = riskScore;
+  window.isPhishing = isPhishing;
   window.modelScore = modelResult.prediction;
   window.modelconfidence = modelResult.confidence;
   window.riskReasons = allReasons;
   console.log('riskReasons:',riskReasons)
   // For testing: Save to localStorage
 
-  localStorage.setItem('riskScore', riskScore);
+  localStorage.setItem('isPhishing', Number(isPhishing));
   localStorage.setItem('modelScore', modelResult.prediction);
   localStorage.setItem('modelconfidence', modelResult.confidence);
   localStorage.setItem('riskReasons', JSON.stringify(allReasons));
@@ -597,7 +600,7 @@ async function checkForPhishing() {
   localStorage.setItem('contentAnalysis_score', contentAnalysis.score);
   localStorage.setItem('dynamicAnalysis_score', dynamicAnalysis.score);
 
-  console.log('localStorage.riskScore:',localStorage.riskScore)
+  console.log('localStorage.isPhishing:',Number(localStorage.isPhishing))
   console.log('localStorage.modelScore:',localStorage.modelScore)
   console.log('localStorage.modelconfidence:',localStorage.modelconfidence)
   console.log('localStorage.urlAnalysis_score:',localStorage.urlAnalysis_score)
