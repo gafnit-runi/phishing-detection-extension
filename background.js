@@ -5,32 +5,46 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log('Phishing Detection Extension installed');
 });
 
-// Store analysis results
-const analysisResults = new Map();
-
 // Track navigation events
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
-  // console.log('Navigation starting:', details.url);
   // Clear stored results for this tab when navigation starts
-  analysisResults.delete(details.tabId);
+  try {
+    if (chrome.storage && chrome.storage.local) {
+      chrome.storage.local.remove(`analysis_${details.tabId}`, () => {
+        console.log('Cleared analysis results for tab:', details.tabId);
+      });
+    } else {
+      console.warn('Chrome storage API not available');
+    }
+  } catch (error) {
+    console.error('Error clearing analysis results:', error);
+  }
 });
 
 // Function to safely send message to a tab
 async function sendMessageToTab(tabId, message) {
   try {
     // Check if tab exists
-
     const tab = await chrome.tabs.get(tabId);
     if (!tab) {
       console.error('Tab not found:', tabId);
       return;
     }
 
-    // Send message to content script
-    await chrome.tabs.sendMessage(tabId, message);
-    console.log('Message sent successfully');
+    // Send message to content script and wait for response
+    return new Promise((resolve, reject) => {
+      chrome.tabs.sendMessage(tabId, message, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error('Error sending message:', chrome.runtime.lastError);
+          reject(chrome.runtime.lastError);
+          return;
+        }
+        resolve(response);
+      });
+    });
   } catch (error) {
     console.error('Error sending message to tab:', error);
+    throw error;
   }
 }
 
@@ -126,18 +140,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log("check_url", request.url);
     const { prediction, confidence } = detectPhishing(request.url);
     sendResponse({ prediction: prediction, confidence: confidence });
+    return true;  // Keep the message channel open for async response
   }
-  return true;
 });
-
-// Track scanning status
-const scanningTabs = new Set();
 
 // Listen for messages from content script and popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === 'SCAN_RESULT') {
+  if (request.from === 'content' && request.type === 'ANALYSIS_RESULT') {
     console.log('Received scan result:', request.data);
-   
+    
     // Store the result with timestamp
     if (sender.tab) {
       const resultWithTimestamp = {
@@ -145,42 +156,97 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         timestamp: new Date().toISOString()
       };
 
-      analysisResults.set(sender.tab.id, resultWithTimestamp);
-      scanningTabs.delete(sender.tab.id);  // Mark scan as complete
-      console.log("Stored result for tab", sender.tab.id);
-      console.log("Current keys in analysisResults:", Array.from(analysisResults.keys()));
-      chrome.runtime.sendMessage({
-        type: 'ANALYSIS_RESULT',
-        data: analysisResults.get(sender.tab.id)
-      });
+      // Store result using tabId as part of the key
+      try {
+        if (chrome.storage && chrome.storage.local) {
+          chrome.storage.local.set({ [`analysis_${sender.tab.id}`]: resultWithTimestamp }, () => {
+            console.log("Stored result for tab", sender.tab.id);
+            // Send result to popup
+            try {
+              chrome.runtime.sendMessage({
+                type: 'ANALYSIS_RESULT',
+                from: 'background',
+                data: resultWithTimestamp
+              });
+            } catch (error) {
+              console.error('Error sending analysis result:', error);
+            }
+          });
+        } else {
+          console.warn('Chrome storage API not available');
+        }
+      } catch (error) {
+        console.error('Error storing analysis result:', error);
+      }
     } else {
-      console.warn(" sender.tab is undefined. Message may be from popup or service worker.");
+      console.warn("sender.tab is undefined. Message may be from popup or service worker.");
     }
-  } else if (request.type === 'REQUEST_ANALYSIS') {
+  } else if (request.from === 'popup' && request.type === 'ANALYSIS_REQUEST') {
     // Handle request from popup
-      console.log('Received analysis request from popup');
-      
-      // Check if we have stored results and if force new scan is requested
-      const storedResult = analysisResults.get(request.data.tabId);
-      const forceNewScan = request.data.forceNewScan;
+    console.log('Received analysis request from popup');
+    
+    // Check if we have stored results and if force new scan is requested
+    try {
+      if (chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get([`analysis_${request.data.tabId}`], async (result) => {
+          const storedResult = result[`analysis_${request.data.tabId}`];
+          const forceNewScan = request.data.forceNewScan;
 
-
-      if (storedResult && !forceNewScan) {
-        console.log('Found stored result:', storedResult);
-        // Send stored results to popup
-        console.log('Send stored results to popup')
-        chrome.runtime.sendMessage({
-          type: 'ANALYSIS_RESULT',
-          data: storedResult
+          if (storedResult && !forceNewScan) {
+            console.log('Found stored result:', storedResult);
+            // Send stored results to popup
+            try {
+              chrome.runtime.sendMessage({
+                type: 'ANALYSIS_RESULT',
+                from: 'background',
+                data: storedResult
+              });
+            } catch (error) {
+              console.error('Error sending stored result:', error);
+            }
+          } else {
+            // If no stored results or force new scan, request new analysis
+            console.log('Request new analysis');
+            try {
+              await sendMessageToTab(request.data.tabId, {
+                type: 'ANALYSIS_REQUEST',
+                from: 'background'
+              });
+              // Send response to keep the message port open
+              sendResponse({ received: true });
+            } catch (error) {
+              console.error('Error requesting new analysis:', error);
+              sendResponse({ error: error.message });
+            }
+          }
         });
-
       } else {
-
-        // If no stored results or force new scan, request new analysis
-        console.log('Request new analysis')
+        console.warn('Chrome storage API not available');
+        // If storage is not available, request new analysis
         sendMessageToTab(request.data.tabId, {
-          type: 'REQUEST_ANALYSIS'
+          type: 'ANALYSIS_REQUEST',
+          from: 'background'
+        }).then(() => {
+          sendResponse({ received: true });
+        }).catch(error => {
+          console.error('Error requesting new analysis:', error);
+          sendResponse({ error: error.message });
         });
       }
+    } catch (error) {
+      console.error('Error accessing storage:', error);
+      // If there's an error with storage, request new analysis
+      sendMessageToTab(request.data.tabId, {
+        type: 'ANALYSIS_REQUEST',
+        from: 'background'
+      }).then(() => {
+        sendResponse({ received: true });
+      }).catch(error => {
+        console.error('Error requesting new analysis:', error);
+        sendResponse({ error: error.message });
+      });
+    }
   }
+  // Return true to keep the message port open for async responses
+  return true;
 }); 
