@@ -159,7 +159,7 @@ function detectByStaticURL(url, domain, modelScore = null, modelConfidence = nul
     reasons.push(`High entropy`);
   }
   if (isSuspiciousHost(domain)) {
-    score += 0.5;
+    score += 0.4;
     reasons.push("Hosted on suspicious or free hosting platform");
   }
 
