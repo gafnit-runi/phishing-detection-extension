@@ -1,10 +1,13 @@
 // Content script that runs on every page
 console.log('Phishing Detection Extension: Content script loaded');
+// Global scan status flag
+let isScanning = false;
 
 const SUSPICIOUS_HOSTING = new Set([
   'godaddysites.com', 'weebly.com', 'webflow.io', 'wixsite.com', 'squarespace.com', 'notion.site', 'github.io',
   'netlify.app', 'vercel.app', 'glitch.me', '000webhostapp.com'
 ]);
+
 
 // === Entropy Calculator ===
 /**
@@ -425,142 +428,169 @@ function detectByStaticContent() {
 ////////// Main function to calcualte final score for potential phishing //////////
 
 async function checkForPhishing() {
-  console.log('checkForPhishing');
-  const url = window.location.href;
-  const domain = window.location.hostname;
+  // Check if already scanning
+  if (isScanning) {
+    console.log('Scan already in progress, skipping...');
+    return;
+  }
 
-  // Get ML model prediction from background script
-  const modelResult = await new Promise((resolve) => {
-    chrome.runtime.sendMessage({ action: "check_url", url }, (response) => {
-      resolve(response);
+  // Set scanning flag
+  isScanning = true;
+  console.log('Starting phishing scan...');
+
+  try {
+    const url = window.location.href;
+    const domain = window.location.hostname;
+
+    // Get ML model prediction from background script
+    const modelResult = await new Promise((resolve) => {
+      chrome.runtime.sendMessage({ action: "check_url", url }, (response) => {
+        resolve(response);
+      });
     });
-  });
-
-
-  // Run all detection methods in parallel
-  const [
-    urlAnalysis,
-    contentAnalysis, 
-
-  ] = await Promise.all([
-    detectByStaticURL(url, domain, modelResult.prediction, modelResult.confidence),
-    detectByStaticContent(),
-  ]);
 
     // Run all detection methods in parallel
+    const [
+      urlAnalysis,
+      contentAnalysis, 
+      dynamicAnalysis
+    ] = await Promise.all([
+      detectByStaticURL(url, domain, modelResult.prediction, modelResult.confidence),
+      detectByStaticContent(),
+      detectByDynamicBehavior()
+    ]);
 
-  // const result = await checkUrlWithModel(domain);
-  console.log('urlScore:',urlAnalysis.score)
-  console.log('contentScore:',contentAnalysis.score)
-  
-  // console.log('result:',result)
-  // Calculate final risk score and combine reasons
-  const modelReasons = modelResult.prediction === 1 ? ["ML model predicted phishing domain."] : [];
+    // Calculate final risk score and combine reasons
+    const modelReasons = modelResult.prediction === 1 ? ["ML model predicted phishing domain."] : [];
 
-  const modelScore = modelResult.prediction
-  const modelConfidence = modelResult.confidence
+    const modelScore = modelResult.prediction
+    const modelConfidence = modelResult.confidence
 
-
-  // Check URL for credential-related keywords
-  const credentialKeywords = [
-    // Login related
-    'login', 'log-in', 'log_in', 'signin', 'sign-in', 'sign_in', 'signup', 'sign-up', 'sign_up',
-    'register', 'registration', 'signup', 'sign-up', 'sign_up', 'join', 'create-account',
+    // Check URL for credential-related keywords
+    const credentialKeywords = [
+      // Login related
+      'login', 'log-in', 'log_in', 'signin', 'sign-in', 'sign_in', 'signup', 'sign-up', 'sign_up',
+      'register', 'registration', 'signup', 'sign-up', 'sign_up', 'join', 'create-account',
+      
+      // Account related
+      'account', 'profile', 'user', 'member', 'membership', 'my-account', 'myaccount',
+      
+      // Password related
+      'password', 'passwd', 'pwd', 'reset-password', 'resetpassword', 'forgot-password',
+      'forgotpassword', 'change-password', 'changepassword', 'recover', 'recovery',
+      
+      // Authentication related
+      'auth', 'authenticate', 'authentication', 'verify', 'verification', 'confirm',
+      'confirmation', 'validate', 'validation', 'security', 'secure',
+      
+      // Payment related
+      'payment', 'pay', 'checkout', 'billing', 'invoice', 'order', 'purchase',
+      'subscribe', 'subscription', 'upgrade', 'premium',
+      
+      // Banking related
+      'bank', 'banking', 'transfer', 'transaction', 'deposit', 'withdraw',
+      'balance', 'statement', 'card', 'credit', 'debit',
+      
+      // Identity related
+      'identity', 'id', 'verify-identity', 'identity-verification', 'kyc',
+      'personal-info', 'personal-information'
+    ];
     
-    // Account related
-    'account', 'profile', 'user', 'member', 'membership', 'my-account', 'myaccount',
-    
-    // Password related
-    'password', 'passwd', 'pwd', 'reset-password', 'resetpassword', 'forgot-password',
-    'forgotpassword', 'change-password', 'changepassword', 'recover', 'recovery',
-    
-    // Authentication related
-    'auth', 'authenticate', 'authentication', 'verify', 'verification', 'confirm',
-    'confirmation', 'validate', 'validation', 'security', 'secure',
-    
-    // Payment related
-    'payment', 'pay', 'checkout', 'billing', 'invoice', 'order', 'purchase',
-    'subscribe', 'subscription', 'upgrade', 'premium',
-    
-    // Banking related
-    'bank', 'banking', 'transfer', 'transaction', 'deposit', 'withdraw',
-    'balance', 'statement', 'card', 'credit', 'debit',
-    
-    // Identity related
-    'identity', 'id', 'verify-identity', 'identity-verification', 'kyc',
-    'personal-info', 'personal-information'
-  ];
-  const urlLower = url.toLowerCase();
-  const hasCredentialKeyword = credentialKeywords.some(keyword => urlLower.includes(keyword));
-  
-  // Check for credential input fields
-  const hasUsernameField = document.querySelector('input[type="text"][name*="user"], input[type="email"][name*="user"], input[type="text"][name*="login"], input[type="email"][name*="login"]');
-  const hasPasswordField = document.querySelector('input[type="password"]');
-  
-  const isCredsPage = hasCredentialKeyword || hasUsernameField || hasPasswordField;
-  console.log('isCredsPage:',isCredsPage)
-  const isPhishing = (isCredsPage && modelScore == 1 && modelConfidence > 0.6)
-                  || (isCredsPage && modelScore == 1 && urlAnalysis.score > 0.1 && contentAnalysis.score > 0.1)
-                  || (isCredsPage && modelScore == 1 && urlAnalysis.score > 0.3)
-                  || (isCredsPage && modelScore == 1 && contentAnalysis.score > 0.3)
-                  || (isCredsPage && modelConfidence < 0.9 && urlAnalysis.score > 0.3 && contentAnalysis.score > 0.3)
-                  || (isCredsPage && urlAnalysis.score > 0.4 )
-                  | (isCredsPage && contentAnalysis.score > 0.5)
-                  || (modelScore == 1 && modelConfidence > 0.6 && urlAnalysis.score > 0.2)
-                  || (modelScore == 1 && modelConfidence > 0.6 && contentAnalysis.score > 0.2)
-                  || (modelScore == 1 && urlAnalysis.score > 0.3 && contentAnalysis.score > 0.3)
-                  || (urlAnalysis.score > 0.4 || contentAnalysis.score > 0.5);
+    // Check for credential input fields
+    const hasUsernameField = document.querySelector('input[type="text"][name*="user"], input[type="email"][name*="user"], input[type="text"][name*="login"], input[type="email"][name*="login"]');    const hasUsernameField = document.querySelector('input[type="text"][name*="user"], input[type="email"][name*="user"], input[type="text"][name*="login"], input[type="email"][name*="login"]');
+    const hasPasswordField = document.querySelector('input[type="password"]');
 
-  // Combine all reasons
-  const allReasons = [...urlAnalysis.reasons, ...contentAnalysis.reasons, ...modelReasons];
-  // Expose to window (for Selenium or testing)
-  window.isPhishing = isPhishing;
-  window.modelScore = modelResult.prediction;
-  window.modelconfidence = modelResult.confidence;
-  window.riskReasons = allReasons;
-  window.isCredsPage = isCredsPage;
-  console.log('riskReasons:',riskReasons)
-  // For testing: Save to localStorage
+    const isCredsPage = hasCredentialKeyword || hasUsernameField || hasPasswordField;
+    console.log('isCredsPage:',isCredsPage)
+    const isPhishing = (isCredsPage && modelScore == 1 && modelConfidence > 0.6)
+                    || (isCredsPage && modelScore == 1 && urlAnalysis.score > 0.1 && contentAnalysis.score > 0.1)
+                    || (isCredsPage && modelScore == 1 && urlAnalysis.score > 0.3)
+                    || (isCredsPage && modelScore == 1 && contentAnalysis.score > 0.3)
+                    || (isCredsPage && modelConfidence < 0.9 && urlAnalysis.score > 0.3 && contentAnalysis.score > 0.3)
+                    || (isCredsPage && urlAnalysis.score > 0.4 )
+                    | (isCredsPage && contentAnalysis.score > 0.5)
+                    || (modelScore == 1 && modelConfidence > 0.6 && urlAnalysis.score > 0.2)
+                    || (modelScore == 1 && modelConfidence > 0.6 && contentAnalysis.score > 0.2)
+                    || (modelScore == 1 && urlAnalysis.score > 0.3 && contentAnalysis.score > 0.3)
+                    || (urlAnalysis.score > 0.4 || contentAnalysis.score > 0.5);
 
-  localStorage.setItem('isPhishing', Number(isPhishing));
-  localStorage.setItem('modelScore', modelResult.prediction);
-  localStorage.setItem('modelconfidence', modelResult.confidence);
-  localStorage.setItem('riskReasons', JSON.stringify(allReasons));
-  localStorage.setItem('urlAnalysis_score', urlAnalysis.score);
-  localStorage.setItem('contentAnalysis_score', contentAnalysis.score);
+    // Combine all reasons
+    const allReasons = [...urlAnalysis.reasons, ...contentAnalysis.reasons, ...modelReasons];
+    // Expose to window (for Selenium or testing)
+    window.isPhishing = isPhishing;
+    window.modelScore = modelResult.prediction;
+    window.modelconfidence = modelResult.confidence;
+    window.riskReasons = allReasons;
+    window.isCredsPage = isCredsPage;
+    console.log('riskReasons:',riskReasons)
+    // For testing: Save to localStorage
 
-  localStorage.setItem('isCredsPage', Number(isCredsPage));
-  console.log('localStorage.isPhishing:',Number(localStorage.isPhishing))
-  console.log('localStorage.modelScore:',localStorage.modelScore)
-  console.log('localStorage.modelconfidence:',localStorage.modelconfidence)
-  console.log('localStorage.urlAnalysis_score:',localStorage.urlAnalysis_score)
-  console.log('localStorage.contentAnalysis_score:',localStorage.contentAnalysis_score)
-  
-  console.log('localStorage.riskReasons:',localStorage.riskReasons)
-  // for memory usage testing
-  if (window.performance && window.performance.memory) {
-    console.log("📦 JS Heap Used (bytes):", window.performance.memory.usedJSHeapSize);
-  }
-  // For testing close ////////////////////////////////
+    localStorage.setItem('isPhishing', Number(isPhishing));
+    localStorage.setItem('modelScore', modelResult.prediction);
+    localStorage.setItem('modelconfidence', modelResult.confidence);
+    localStorage.setItem('riskReasons', JSON.stringify(allReasons));
+    localStorage.setItem('urlAnalysis_score', urlAnalysis.score);
+    localStorage.setItem('contentAnalysis_score', contentAnalysis.score);
 
-  // Send results to background script
-  chrome.runtime.sendMessage({
-    type: 'SCAN_RESULT',
-    data: {
-      url,
-      domain,
-      reasons: allReasons,
-      isPhishing
+    localStorage.setItem('isCredsPage', Number(isCredsPage));
+    console.log('localStorage.isPhishing:',Number(localStorage.isPhishing))
+    console.log('localStorage.modelScore:',localStorage.modelScore)
+    console.log('localStorage.modelconfidence:',localStorage.modelconfidence)
+    console.log('localStorage.urlAnalysis_score:',localStorage.urlAnalysis_score)
+    console.log('localStorage.contentAnalysis_score:',localStorage.contentAnalysis_score)
+    
+    console.log('localStorage.riskReasons:',localStorage.riskReasons)
+    // for memory usage testing
+    if (window.performance && window.performance.memory) {
+      console.log("📦 JS Heap Used (bytes):", window.performance.memory.usedJSHeapSize);
     }
-  });
-}
+    // For testing close ////////////////////////////////
+
+    // Send results to background script
+    chrome.runtime.sendMessage({
+      type: 'ANALYSIS_RESULT',
+      from: 'content',
+      data: {
+        url,
+        domain,
+        isPhishing,
+        urlScore: urlAnalysis.score,
+        contentScore: contentAnalysis.score,
+        modelScore: modelScore,
+        reasons: allReasons
+      }
+    });
+  } catch (error) {
+    console.error('Error during phishing scan:', error);
+  } finally {
+    // Reset scanning flag
+    isScanning = false;
+    console.log('Phishing scan completed');
+  }
 
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === 'REQUEST_ANALYSIS') {
+  console.log('Content script received message:', request);
+  if (request.from === 'background' && request.type === 'ANALYSIS_REQUEST') {
     console.log('Received analysis request from background');
-    checkForPhishing();
+    if (!isScanning) {
+      // Start the scan and wait for it to complete
+      checkForPhishing()
+        .then(() => {
+          console.log('Analysis complete');
+          sendResponse({ success: true });
+        })
+        .catch(error => {
+          console.error('Error during analysis:', error);
+          sendResponse({ error: error.message });
+        });
+    } else {
+      console.log('Scan already in progress');
+      sendResponse({ error: 'Scan already in progress' });
+    }
   }
+  // Return true to keep the message port open for async response
+  return true;
 });
 
 // Wait for page to be fully loaded
@@ -568,6 +598,10 @@ window.addEventListener('load', () => {
   // Wait for 3 seconds to catch late-loading content
   setTimeout(async () => {
     console.log('Page fully loaded, starting phishing check');
-    await checkForPhishing();
+    if (!isScanning) {
+      await checkForPhishing();
+    } else {
+      console.log('Scan already in progress, skipping initial check');
+    }
   }, 3000);
 });
