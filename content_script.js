@@ -453,11 +453,10 @@ async function checkForPhishing() {
     const [
       urlAnalysis,
       contentAnalysis, 
-      dynamicAnalysis
+  
     ] = await Promise.all([
       detectByStaticURL(url, domain, modelResult.prediction, modelResult.confidence),
       detectByStaticContent(),
-      detectByDynamicBehavior()
     ]);
 
     // Calculate final risk score and combine reasons
@@ -495,9 +494,10 @@ async function checkForPhishing() {
       'identity', 'id', 'verify-identity', 'identity-verification', 'kyc',
       'personal-info', 'personal-information'
     ];
-    
+    const urlLower = url.toLowerCase();
+    const hasCredentialKeyword = credentialKeywords.some(keyword => urlLower.includes(keyword));
     // Check for credential input fields
-    const hasUsernameField = document.querySelector('input[type="text"][name*="user"], input[type="email"][name*="user"], input[type="text"][name*="login"], input[type="email"][name*="login"]');    const hasUsernameField = document.querySelector('input[type="text"][name*="user"], input[type="email"][name*="user"], input[type="text"][name*="login"], input[type="email"][name*="login"]');
+    const hasUsernameField = document.querySelector('input[type="text"][name*="user"], input[type="email"][name*="user"], input[type="text"][name*="login"], input[type="email"][name*="login"]');    
     const hasPasswordField = document.querySelector('input[type="password"]');
 
     const isCredsPage = hasCredentialKeyword || hasUsernameField || hasPasswordField;
@@ -567,6 +567,7 @@ async function checkForPhishing() {
     isScanning = false;
     console.log('Phishing scan completed');
   }
+}
 
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
